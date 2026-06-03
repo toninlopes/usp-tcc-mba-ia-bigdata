@@ -10,7 +10,7 @@ O pré-processamento textual constitui uma etapa crítica em qualquer \textit{pi
 
 As decisões de pré-processamento adotadas neste trabalho foram calibradas em função de duas considerações centrais: (i) as características específicas das publicações financeiras do X/Twitter identificadas na AED (\autoref{sec:eda}); e (ii) os requisitos de entrada de cada abordagem de classificação. Em particular, o modelo FinBERT-PT-BR, cujo tokenizador interno — baseado em \textit{WordPiece} — já realiza parte da segmentação subtextual de forma automática \cite{santos2023finbert,devlin2019}, dispensa etapas de normalização agressiva como \textit{stemização} e remoção de \textit{stopwords}, pois captura variações morfológicas por meio de seus mecanismos de atenção contextual \cite{jurafsky2026}. Isso motivou a existência de dois fluxos de pré-processamento distintos no \textit{pipeline}, descritos nas subseções a seguir.
 
-As funções de limpeza residem em \textbf{\texttt{shared/text\_cleaner.py}}, módulo transversal compartilhado entre os estágios \texttt{04\_preprocessing} e \texttt{05\_processing}, garantindo consistência e evitando duplicação de código.
+As funções de limpeza residem em \textbf{\texttt{app/shared/text\_cleaner.py}}, módulo transversal compartilhado entre os estágios de pré-processamento e classificação, garantindo consistência e evitando duplicação de código.
 
 \subsection{Fluxo Completo — Abordagem Léxica}
 \label{subsec:fluxo_lexico}
@@ -77,13 +77,13 @@ O \autoref{qua:exemplo_clean} ilustra o resultado da aplicação sequencial das 
 		Após \texttt{clean()} & \texttt{:rotating\_light: alta IBOV! saber [URL] [MENTION]} \\
 		\hline
 	\end{tabular}
-	\legend{Fonte: Elaborado pelo autor com base no código-fonte de \texttt{shared/text\_cleaner.py}.}
+	\legend{Fonte: Elaborado pelo autor com base no código-fonte de \texttt{app/shared/text\_cleaner.py}.}
 \end{quadro}
 
 \subsection{Fluxo Reduzido — FinBERT-PT-BR}
 \label{subsec:fluxo_finbert}
 
-O FinBERT-PT-BR utiliza um fluxo de pré-processamento próprio, implementado no método \texttt{preprocess()} da classe \texttt{FinBERTAnalyzer} (\texttt{pipeline/05\_processing/fin\_bert\_timbau.py}), que importa seletivamente as funções de \texttt{shared/text\_cleaner.py} e aplica apenas seis das oito etapas descritas na \autoref{subsec:fluxo_lexico}. As diferenças em relação ao fluxo completo são:
+O FinBERT-PT-BR utiliza um fluxo de pré-processamento próprio, implementado no método \texttt{preprocess()} da classe \texttt{FinBertPTBRAnalyzer} (\texttt{app/core/processing/bert/finbert\_ptbr.py}), que importa seletivamente as funções de \texttt{app/shared/text\_cleaner.py} e aplica apenas seis das oito etapas descritas na \autoref{subsec:fluxo_lexico}. As diferenças em relação ao fluxo completo são:
 
 \begin{itemize}
 	\item \textbf{Emojis}: em vez de converter para \textit{name codes}, os emojis são \textbf{removidos} via \texttt{emoji.replace\_emoji()}. Essa decisão decorre do fato de que o vocabulário do FinBERT-PT-BR não foi treinado sobre \textit{name codes} de emojis, tornando sua presença potencialmente ruidosa para o modelo;
@@ -119,14 +119,14 @@ O \autoref{qua:comparativo_preproc} sintetiza as diferenças entre os dois fluxo
 		\hline
 	\end{tabular}
 
-	\legend{Fonte: Elaborado pelo autor com base no código-fonte de \texttt{shared/text\_cleaner.py}, \texttt{pipeline/05\_processing/fin\_bert\_timbau.py} e \texttt{pipeline/05\_processing/bert\_timbau.py}.}
+	\legend{Fonte: Elaborado pelo autor com base no código-fonte de \texttt{app/shared/text\_cleaner.py}, \texttt{app/core/processing/bert/finbert\_ptbr.py} e \texttt{app/core/processing/bert/bert\_timbau.py}.}
 	\end{quadro}
 	
 	
 \subsection{Fluxo Reduzido --- BERTimbau Ajustado}
 \label{subsec:fluxo_bertimbau}
 	
-O BERTimbau ajustado (\autoref{subsec:bertimbau}) utiliza um fluxo de pré-processamento idêntico ao descrito na \autoref{subsec:fluxo_finbert} para o FinBERT-PT-BR, implementado no método \texttt{preprocess()} da classe \texttt{BERTimbauAnalyzer} (\texttt{pipeline/05\_processing/bert\_timbau.py}). As mesmas seis etapas são aplicadas na mesma ordem: substituição de URLs, remoção de emojis, substituição de menções, remoção do símbolo de \textit{hashtag}, normalização de espaçamento e normalização de caixa com preservação de entidades financeiras. A justificativa é análoga: por operar sobre o tokenizador \textit{WordPiece} interno ao BERT, o modelo processa as variações morfológicas por meio do mecanismo de atenção contextual, tornando desnecessárias as etapas de remoção de \textit{stopwords} e lematização \cite{devlin2019}.
+O BERTimbau ajustado (\autoref{subsec:bertimbau}) utiliza um fluxo de pré-processamento idêntico ao descrito na \autoref{subsec:fluxo_finbert} para o FinBERT-PT-BR, implementado no método \texttt{preprocess()} da classe \texttt{BERTimbauAnalyzer} (\texttt{app/core/processing/bert/bert\_timbau.py}). As mesmas seis etapas são aplicadas na mesma ordem: substituição de URLs, remoção de emojis, substituição de menções, remoção do símbolo de \textit{hashtag}, normalização de espaçamento e normalização de caixa com preservação de entidades financeiras. A justificativa é análoga: por operar sobre o tokenizador \textit{WordPiece} interno ao BERT, o modelo processa as variações morfológicas por meio do mecanismo de atenção contextual, tornando desnecessárias as etapas de remoção de \textit{stopwords} e lematização \cite{devlin2019}.
 	
 Uma distinção relevante em relação ao FinBERT-PT-BR diz respeito à escolha da variante do modelo base. O BERTimbau é utilizado na versão \texttt{bert-base-portuguese-cased} (\texttt{neuralmind/bert-base-portuguese-cased}), que preserva a distinção entre maiúsculas e minúsculas durante a tokenização. Essa escolha é coerente com a etapa de normalização de caixa com preservação de entidades: ao manter \textit{tickers} (e.g., \texttt{PETR4}, \texttt{VALE3}) e siglas financeiras (e.g., \texttt{COPOM}, \texttt{SELIC}, \texttt{B3}) em maiúsculas, o pré-processamento disponibiliza ao modelo um sinal de identidade semântica que o tokenizador \textit{cased} é capaz de explorar diretamente na construção das representações contextuais \cite{souza2020}.
 	
@@ -134,5 +134,5 @@ Uma distinção relevante em relação ao FinBERT-PT-BR diz respeito à escolha 
 \subsection{Testes Unitários}
 \label{subsec:testes_preprocessamento}
 
-O módulo de pré-processamento é acompanhado de um arquivo de testes unitários co-localizado em \texttt{shared/text\_cleaner\_tests.py}, executado via \texttt{pytest} a partir da raiz do projeto. Os testes verificam o comportamento de cada função individualmente — cobrindo URLs, emojis, menções, \textit{hashtags}, espaçamento, normalização de caixa, \textit{stopwords} e lematização —, assegurando que alterações futuras no módulo não introduzam regressões silenciosas no fluxo de
+O módulo de pré-processamento é acompanhado de um arquivo de testes unitários co-localizado em \texttt{app/shared/text\_cleaner\_tests.py}, executado via \texttt{pytest} a partir da raiz do projeto. Os testes verificam o comportamento de cada função individualmente — cobrindo URLs, emojis, menções, \textit{hashtags}, espaçamento, normalização de caixa, \textit{stopwords} e lematização —, assegurando que alterações futuras no módulo não introduzam regressões silenciosas no fluxo de
 pré-processamento.

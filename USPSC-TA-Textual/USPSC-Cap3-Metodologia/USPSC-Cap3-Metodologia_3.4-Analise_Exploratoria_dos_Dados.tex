@@ -6,16 +6,16 @@
 \section{Análise Exploratória dos Dados}
 \label{sec:eda}
 
-Após a coleta e persistência dos registros no banco de dados PostgreSQL, o corpus foi submetido a uma Análise Exploratória dos Dados (AED) com três objetivos: (i)~caracterizar a dimensão e a composição do conjunto coletado; (ii)~verificar a completude dos campos e identificar valores ausentes; e (iii)~examinar a distribuição do comprimento dos textos e detectar publicações atípicas que pudessem comprometer a etapa de classificação de sentimento. A AED foi implementada em Python como o terceiro estágio do \textit{pipeline} (\texttt{pipeline/03\_eda/}), estruturado em dois módulos Streamlit com responsabilidades complementares, ambos acessados via \texttt{streamlit run pipeline/03\_eda/dashboard.py}:
+Após a coleta e persistência dos registros no banco de dados PostgreSQL, o corpus foi submetido a uma Análise Exploratória dos Dados (AED) com três objetivos: (i)~caracterizar a dimensão e a composição do conjunto coletado; (ii)~verificar a completude dos campos e identificar valores ausentes; e (iii)~examinar a distribuição do comprimento dos textos e detectar publicações atípicas que pudessem comprometer a etapa de classificação de sentimento. A AED foi implementada em Python como o terceiro estágio do \textit{pipeline} (\texttt{app/dashboard/}), estruturado em dois módulos Streamlit com responsabilidades complementares, ambos acessados via \texttt{streamlit run app/dashboard/app.py}:
 
 \begin{itemize}
-	\item \texttt{pipeline/03\_eda/eda.py}: responsável pela análise textual do corpus — dimensões do conjunto, completude dos campos, distribuição do comprimento dos textos (caracteres e tokens) e
+	\item \texttt{app/dashboard/pages/exploration.py}: responsável pela análise textual do corpus — dimensões do conjunto, completude dos campos, distribuição do comprimento dos textos (caracteres e tokens) e
 	identificação de publicações atípicas;
 	
-	\item \texttt{pipeline/03\_eda/dashboard.py}: responsável pela visualização da distribuição de sentimentos e de relevância financeira entre as publicações já rotuladas, por meio de gráficos de setores interativos.
+	\item \texttt{app/dashboard/pages/eda.py}: responsável pela visualização da distribuição de sentimentos e de relevância financeira entre as publicações já rotuladas, por meio de gráficos de setores interativos.
 \end{itemize}
 
-Ambos os módulos obtêm os dados diretamente do banco de dados PostgreSQL via \texttt{shared/database.py}, com o auxílio das bibliotecas \texttt{pandas} \cite{pandas2020}, \texttt{plotly} e \texttt{streamlit}. Os resultados das subseções a seguir são provenientes do módulo \texttt{eda.py}.
+Ambos os módulos obtêm os dados diretamente do banco de dados PostgreSQL via \texttt{app/shared/db/database.py}, com o auxílio das bibliotecas \texttt{pandas} \cite{pandas2020}, \texttt{plotly} e \texttt{streamlit}. Os resultados das subseções a seguir são provenientes do módulo \texttt{eda.py}.
 
 
 \subsection{Dimensões do Corpus e Distribuição por Veículo}

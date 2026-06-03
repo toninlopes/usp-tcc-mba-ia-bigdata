@@ -8,6 +8,7 @@
 
 Em consonância com o Objetivo Específico~4 estabelecido na \autoref{sec:objetivos} — avaliar e comparar o desempenho de diferentes abordagens de classificação de sentimento no domínio financeiro em português —, este trabalho avalia três paradigmas metodológicos distintos: a abordagem \textbf{baseada em léxico}, a abordagem \textbf{baseada em modelo de linguagem pré-treinado especializado por domínio} (FinBERT-PT-BR) e a abordagem \textbf{baseada em modelo de linguagem pré-treinado genérico ajustado por \textit{fine-tuning} em dados locais} (BERTimbau). A distinção entre os dois paradigmas neurais é deliberada: enquanto o FinBERT-PT-BR obtém sua especialização por meio de pré-treinamento sobre um corpus financeiro de larga escala em etapa anterior a este trabalho, o BERTimbau parte de um modelo genérico e adquire especialização \textit{a posteriori}, por meio de ajuste fino sobre o próprio corpus de \textit{tweets} financeiros coletados. Essa dicotomia --- especialização prévia de domínio versus especialização \textit{post hoc} de gênero textual e subdomínio --- constitui o eixo central da comparação empírica apresentada no \autoref{Cap:Ava_Exp}. A inclusão de métodos léxicos permite situar ambas as abordagens neurais em relação às ferramentas de referência disponíveis para o português, orientando recomendações práticas para trabalhos futuros \cite{kearney2014,sousa2025}.
 
+
 \subsection{Abordagem Baseada em Léxico: OpLexicon}
 \label{subsec:abordagem_lexica}
 
@@ -28,8 +29,8 @@ O OpLexicon v3.0 é distribuído como arquivo de texto tabular (\textit{tab-sepa
 \subsubsection{Implementação e Protocolo de Pontuação}
 \label{subsubsec:protocolo_oplexicon}
 
-A implementação foi realizada no quinto estágio do \textit{pipeline} por meio da classe \texttt{OpLexiconAnalyzer}, definida em \texttt{pipeline/05\_processing/oplexicon\_analyzer.py}. A classe herda de \texttt{BaseSentimentAnalyzer} — a mesma classe abstrata (ABC) que fundamenta o
-\texttt{FinBERTAnalyzer} —, garantindo interface uniforme entre as duas abordagens e extensibilidade para classificadores futuros.
+A implementação foi realizada no quinto estágio do \textit{pipeline} por meio da classe \texttt{OpLexiconAnalyzer}, definida em \texttt{app/core/processing/lexicon/op\_lexicon.py}. A classe herda de \texttt{BaseSentimentAnalyzer} — a mesma classe abstrata (ABC) que fundamenta o
+\texttt{FinBertPTBRAnalyzer} —, garantindo interface uniforme entre as duas abordagens e extensibilidade para classificadores futuros.
 
 O protocolo de pontuação compreende as seguintes etapas:
 
@@ -114,7 +115,7 @@ O SentiLex-PT02 é distribuído como arquivo de texto simples, com uma entrada p
 \subsubsection{Implementação e Protocolo de Pontuação}
 \label{subsubsec:protocolo_sentilex}
 
-A implementação foi realizada no quinto estágio do \textit{pipeline} por meio da classe \texttt{SentiLexAnalyzer}, definida em \texttt{pipeline/05\_processing/sentilex\_analyzer.py}. A classe herda de \texttt{BaseSentimentAnalyzer} (\texttt{pipeline/05\_processing/base\_model.py}), garantindo interface uniforme com o \texttt{OpLexiconAnalyzer} e o \texttt{FinBERTAnalyzer}.
+A implementação foi realizada no quinto estágio do \textit{pipeline} por meio da classe \texttt{SentiLexAnalyzer}, definida em \texttt{app/core/processing/lexicon/senti\_lex.py}. A classe herda de \texttt{BaseSentimentAnalyzer} (\texttt{app/core/processing/base\_analyzer.py}), garantindo interface uniforme com o \texttt{OpLexiconAnalyzer} e o \texttt{FinBertPTBRAnalyzer}.
 
 O protocolo de pontuação compreende as seguintes etapas:
 
@@ -168,13 +169,13 @@ O modelo base utilizado para o \textit{fine-tuning} é o \textbf{BERTimbau} \cit
 \subsubsection{Implementação e Protocolo de Inferência}
 \label{subsubsec:protocolo_inferencia}
 
-A inferência foi implementada no quinto estágio do \textit{pipeline} (\texttt{pipeline/05\_processing/}), por meio da classe \texttt{FinBERTAnalyzer}, definida em
-\texttt{pipeline/05\_processing/fin\_bert\_timbau.py}. A classe herda de \texttt{BaseSentimentAnalyzer} (\texttt{pipeline/05\_processing/base\_model.py}), uma classe abstrata (ABC) que estabelece o contrato de interface para qualquer analisador de sentimento no \textit{pipeline}, garantindo extensibilidade para futuros modelos.
+A inferência foi implementada no quinto estágio do \textit{pipeline} (\texttt{app/core/processing/bert/}), por meio da classe \texttt{FinBertPTBRAnalyzer}, definida em
+\texttt{app/core/processing/bert/finbert\_ptbr.py}. A classe herda de \texttt{BaseSentimentAnalyzer} (\texttt{app/core/processing/base\_analyzer.py}), uma classe abstrata (ABC) que estabelece o contrato de interface para qualquer analisador de sentimento no \textit{pipeline}, garantindo extensibilidade para futuros modelos.
 
 O protocolo de inferência compreende as seguintes etapas:
 
 \begin{enumerate}
-	\item \textbf{Seleção dos registros}: o método \texttt{run()} recupera via \texttt{shared/database.py} exclusivamente as publicações que já possuem classificação humana em \texttt{tweets\_classification} mas ainda não foram processadas pelo FinBERT-PT-BR. Esse critério garante que a inferência do modelo opere sobre o mesmo subconjunto utilizado como \textit{gold standard}, permitindo comparação direta entre as duas abordagens;
+	\item \textbf{Seleção dos registros}: o método \texttt{run()} recupera via \texttt{app/shared/db/database.py} exclusivamente as publicações que já possuem classificação humana em \texttt{tweets\_classification} mas ainda não foram processadas pelo FinBERT-PT-BR. Esse critério garante que a inferência do modelo opere sobre o mesmo subconjunto utilizado como \textit{gold standard}, permitindo comparação direta entre as duas abordagens;
 	
 	\item \textbf{Pré-processamento}: cada texto é submetido ao método \texttt{preprocess()} da própria classe, que aplica o fluxo reduzido descrito na \autoref{subsec:fluxo_finbert} — substituição de URLs e menções, remoção de emojis, remoção do símbolo de \textit{hashtag}, normalização de espaços e normalização de caixa com preservação de entidades financeiras;
 	
@@ -185,7 +186,7 @@ O protocolo de inferência compreende as seguintes etapas:
 	\item \textbf{Mapeamento de \textit{labels}}: os rótulos em inglês retornados pelo modelo são normalizados para o português: \texttt{POSITIVE} → \texttt{positivo}, 	\texttt{NEGATIVE} → \texttt{negativo}, \texttt{NEUTRAL} → \texttt{neutro};
 	
 	\item \textbf{Persistência e visualização}: os resultados são armazenados em \texttt{tweets\_classification} com \texttt{classificator = "FinBERT-PT-BR"} e o respectivo
-	\texttt{score}. O painel Streamlit de processamento (\texttt{pipeline/05\_processing/processing\_dashboard.py}), invocado via \texttt{make process}, apresenta a comparação entre o sentimento predito pelo modelo e o sentimento anotado pelo humano tweet a tweet, além de métricas de concordância.
+	\texttt{score}. O painel Streamlit de processamento (\texttt{app/dashboard/pages/processing.py}), invocado via \texttt{make dashboard}, apresenta a comparação entre o sentimento predito pelo modelo e o sentimento anotado pelo humano tweet a tweet, além de métricas de concordância.
 \end{enumerate}
 
 \subsection{Abordagem Baseada em Modelo de Linguagem Pré-treinado com \textit{Fine-tuning}: BERTimbau}
@@ -209,16 +210,19 @@ O \textbf{BERTimbau} \cite{souza2020} foi selecionado como modelo base para a ab
 
 O modelo base utilizado é o \texttt{neuralmind/bert-base-portuguese-cased}, disponível publicamente no repositório \textit{Hugging Face}. Sobre esse modelo, realiza-se o \textit{fine-tuning} para a tarefa de classificação de sequência em três classes --- \textbf{Positivo}, \textbf{Neutro} e \textbf{Negativo} ---, por meio da adição de uma camada de classificação linear sobre a representação do \textit{token} especial \texttt{[CLS]}, que codifica o sentido global da sequência de entrada \cite{devlin2019}.
 
-O protocolo de \textit{fine-tuning} é implementado no script \texttt{pipeline/05\_processing/bert\_timbau\_fine\_tuner.py} e compreende as seguintes decisões de configuração:
+O protocolo de \textit{fine-tuning} é implementado no script \texttt{app/core/processing/bert/bert\_timbau\_fine\_tuner.py} e compreende as seguintes decisões de configuração:
 
 \begin{itemize}
-	\item \textbf{Particionamento}: o corpus rotulado é particionado segundo o protocolo descrito na \autoref{subsec:particionamento} --- divisão estratificada 70/15/15 com \texttt{random\_state=42}, persistindo os identificadores de cada conjunto em arquivos auxiliares (\texttt{train\_split.csv}, \texttt{val\_split.csv}, \texttt{test\_split.csv}) na pasta \texttt{models/bert-timbau-sentiment/eval/};
+
+	\item \textbf{Particionamento}: o corpus rotulado é particionado em etapa dedicada, anterior ao \textit{fine-tuning}, conforme o protocolo descrito na \autoref{subsec:particionamento}. O particionamento é gerenciado pela classe \texttt{DatasetSplitRepository} (\texttt{app/shared/db/dataset\_split.py}), que persiste o resultado na tabela \texttt{dataset\_split} em dois conjuntos mutuamente exclusivos: (i)~\textbf{hold-out de teste} ($\approx$~15\% dos registros), extraído por amostragem estratificada com \texttt{random\_state=42} e reservado exclusivamente para a avaliação comparativa final descrita na \autoref{subsec:metricas_avaliacao}, marcado com \texttt{split=`test'} e \texttt{fold=NULL}; e (ii)~\textbf{conjunto de treinamento} ($\approx$~85\%), subdividido em $K=4$ folds por validação cruzada estratificada (\texttt{StratifiedKFold}, $K=4$, \texttt{shuffle=True}, \texttt{random\_state=42}), marcado com \texttt{split=`train'} e \texttt{fold}~$\in \{1, 2, 3, 4\}$;
+	
+	\item \textbf{Validação cruzada e seleção do modelo}: o \textit{fine-tuning} é executado $K=4$ vezes, uma por fold. Em cada iteração~$k$, os registros com \texttt{fold}~$\neq k$ ($\approx$~64\% do total rotulado) formam o conjunto de treinamento efetivo, e os registros com \texttt{fold}~$= k$ ($\approx$~21\%) formam o conjunto de validação. Ao término das $K$ iterações, o modelo correspondente ao fold com maior F1-Score macro na validação é selecionado como modelo definitivo e persistido em \texttt{models/bert-timbau-sentiment/}, acompanhado do relatório de classificação e do resumo do K-Fold em \texttt{models/bert-timbau-sentiment/eval/};
 	
 	\item \textbf{Ponderação de classes}: dado o desbalanceamento esperado em favor da classe neutra, os pesos por classe são calculados via \texttt{compute\_class\_weight(class\_weight=`balanced')} da biblioteca \texttt{scikit-learn} e injetados na função de perda (\texttt{CrossEntropyLoss}) por meio de uma subclasse \texttt{WeightedTrainer}, garantindo que o modelo não colapse para predizer sistematicamente a classe majoritária;
 	
-	\item \textbf{Hiperparâmetros}: taxa de aprendizado $2 \times 10^{-5}$, tamanho de lote (\textit{batch size}) 16, comprimento máximo de sequência 128 \textit{tokens}, razão de \textit{warmup} 0,1 e decaimento de pesos (\textit{weight decay}) $10^{-2}$. Esses valores seguem as recomendações dos autores do BERT para \textit{fine-tuning} em conjuntos de dados de tamanho moderado \cite{devlin2019};
+	\item \textbf{Hiperparâmetros}: taxa de aprendizado $5 \times 10^{-5}$, tamanho de lote (\textit{batch size}) 8, comprimento máximo de sequência 512 \textit{tokens}, razão de \textit{warmup} 0,1 e decaimento de pesos (\textit{weight decay}) $10^{-2}$. Esses valores foram determinados por busca empírica sobre o conjunto de validação cruzada e são consistentes com as recomendações dos autores do BERT para \textit{fine-tuning} em conjuntos de dados de tamanho moderado \cite{devlin2019};
 	
-	\item \textbf{\textit{Early stopping}}: o treinamento é limitado a seis épocas, com critério de parada antecipada (\textit{patience}~=~2) monitorando o F1-Score macro no conjunto de validação. O \textit{checkpoint} com melhor F1-Score macro na validação é selecionado automaticamente como modelo final, prevenindo o \textit{overfitting} à distribuição de treinamento;
+	\item \textbf{\textit{Early stopping}}: o treinamento de cada fold é limitado a doze épocas, com critério de parada antecipada (\textit{patience}~=~2) monitorando o F1-Score macro no conjunto de validação do fold corrente. O \textit{checkpoint} com melhor F1-Score macro é restaurado automaticamente ao término de cada iteração, prevenindo o \textit{overfitting} à distribuição de treinamento;
 	
 	\item \textbf{Reprodutibilidade}: a semente aleatória \texttt{random\_state=42} é fixada em todas as operações estocásticas do treinamento (\texttt{seed} do \texttt{TrainingArguments}), garantindo que execuções sucessivas sobre o mesmo corpus produzam resultados idênticos.
 \end{itemize}
@@ -228,7 +232,7 @@ O modelo ajustado, o tokenizador e o mapeamento de rótulos (\texttt{id2label.js
 \subsubsection{Implementação e Protocolo de Inferência}
 \label{subsubsec:protocolo_inferencia_bertimbau}
 
-A inferência é implementada pela classe \texttt{BERTimbauAnalyzer}, definida em \texttt{pipeline/05\_processing/bert\_timbau.py}. Assim como \texttt{FinBERTAnalyzer}, a classe herda de \texttt{BaseSentimentAnalyzer} (\texttt{pipeline/05\_processing/base\_model.py}), garantindo que ambos os analisadores compartilhem o mesmo contrato de interface e possam ser alternados pelo painel de processamento sem modificações adicionais. O protocolo de inferência é análogo ao descrito na \autoref{subsubsec:protocolo_inferencia}, com as seguintes particularidades:
+A inferência é implementada pela classe \texttt{BERTimbauAnalyzer}, definida em \texttt{app/core/processing/bert/bert\_timbau.py}. Assim como \texttt{FinBertPTBRAnalyzer}, a classe herda de \texttt{BaseSentimentAnalyzer} (\texttt{app/core/processing/base\_analyzer.py}), garantindo que ambos os analisadores compartilhem o mesmo contrato de interface e possam ser alternados pelo painel de processamento sem modificações adicionais. O protocolo de inferência é análogo ao descrito na \autoref{subsubsec:protocolo_inferencia}, com as seguintes particularidades:
 
 \begin{enumerate}
 	\item \textbf{Pré-requisito de treinamento}: a classe verifica na inicialização a existência do diretório \texttt{models/bert-timbau-sentiment/}; caso ausente, emite um erro orientando o usuário a executar \texttt{python -m pipeline.05\_processing.bert\_timbau\_fine\_tuner} (atalho: \texttt{make finetune}) antes da inferência;
@@ -244,7 +248,7 @@ A inferência é implementada pela classe \texttt{BERTimbauAnalyzer}, definida e
 \subsection{Métricas de Avaliação das Abordagens}
 \label{subsec:metricas_avaliacao}
 
-A comparação entre as quatro abordagens --- OpLexicon, SentiLex-PT, FinBERT-PT-BR e BERTimbau ajustado --- será realizada exclusivamente sobre o conjunto de teste \textit{hold-out} definido na \autoref{subsec:particionamento}, que constitui o \textit{gold standard} efetivo da avaliação. Essa restrição é necessária para garantir comparabilidade: como o BERTimbau ajustado viu parte do corpus rotulado durante o treinamento, avaliá-lo sobre o conjunto completo produziria estimativas otimistas de desempenho incomparáveis às das demais abordagens. A implementação das métricas está organizada no sexto estágio do \textit{pipeline} (\texttt{pipeline/06\_evaluation/metrics.py}), invocado via \texttt{make evaluate}. As métricas calculadas são:
+A comparação entre as quatro abordagens --- OpLexicon, SentiLex-PT, FinBERT-PT-BR e BERTimbau ajustado --- será realizada exclusivamente sobre o conjunto de teste \textit{hold-out} definido na \autoref{subsec:particionamento}, que constitui o \textit{gold standard} efetivo da avaliação. Essa restrição é necessária para garantir comparabilidade: como o BERTimbau ajustado viu parte do corpus rotulado durante o treinamento, avaliá-lo sobre o conjunto completo produziria estimativas otimistas de desempenho incomparáveis às das demais abordagens. A implementação das métricas está organizada no sexto estágio do \textit{pipeline} (\texttt{app/core/evaluation/metrics.py}), invocado via \texttt{make evaluate}. As métricas calculadas são:
 
 \begin{itemize}
 	\item \textbf{Acurácia}: proporção de classificações corretas sobre o total de instâncias do conjunto de teste;
