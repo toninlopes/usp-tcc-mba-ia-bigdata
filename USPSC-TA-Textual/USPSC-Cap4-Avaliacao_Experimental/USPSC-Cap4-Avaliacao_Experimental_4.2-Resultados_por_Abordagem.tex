@@ -1,0 +1,195 @@
+% ============================================================
+%  USPSC-Cap4-Avaliacao_Experimental_4.2-Resultados_por_Abordagem.tex
+%  Seção 4.2 — Resultados por Abordagem
+% ============================================================
+
+\section{Resultados por Abordagem}
+\label{sec:resultados_abordagem}
+
+Esta seção apresenta os resultados individuais de cada abordagem de classificação sobre o conjunto de teste ($n = 373$). Para cada abordagem são reportados: o relatório completo de classificação por classe (\autoref{subsec:metricas_avaliacao}) e a matriz de confusão, que evidencia os padrões sistemáticos de acerto e erro.
+
+
+% ── 4.2.1 OpLexicon ──────────────────────────────────────────────────────────
+
+\subsection{OpLexicon v3.0}
+\label{subsec:res_oplexicon}
+
+O OpLexicon~v3.0 \cite{souza2011oplexicon} classifica cada publicação pela polaridade líquida dos termos presentes no léxico, após a etapa de pré-processamento. O resultado apresentado na \autoref{tab:metrics_oplexicon} revela o desempenho mais baixo entre as quatro abordagens avaliadas.
+
+
+\begin{table}[!htbp]
+	\caption[Métricas de desempenho — OpLexicon v3.0]{Métricas de desempenho do OpLexicon v3.0 ($n = 373$)}
+	\label{tab:metrics_oplexicon}
+	\centering
+	\begin{tabular}{lcccc}
+		\hline
+		\textbf{Classe}    & \textbf{Precisão} & \textbf{Revocação} & \textbf{F1-Score} & \textbf{Suporte} \\
+		\hline
+		Positivo           & 0,17              & 0,81               & 0,28              & 59  \\
+		Neutro             & 0,78              & 0,12               & 0,21              & 266 \\
+		Negativo           & 0,19              & 0,19               & 0,19              & 48  \\
+		\hline
+		\textit{Macro avg} & 0,38              & 0,37               & 0,23              & 373 \\
+		\textit{Acurácia}  & ---               & ---                & 0,24              & 373 \\
+		\hline
+	\end{tabular}
+	\legend{Fonte: Elaborada pelo autor.}
+\end{table}
+
+
+\begin{table}[!htbp]
+	\caption[Matriz de confusão — OpLexicon v3.0]{Matriz de confusão do OpLexicon v3.0. Linhas: rótulo verdadeiro; colunas: rótulo predito.}
+	\label{tab:cm_oplexicon}
+	\centering
+	\begin{tabular}{lccc}
+		\hline
+		& \textbf{Pred. Positivo} & \textbf{Pred. Neutro} & \textbf{Pred. Negativo} \\
+		\hline
+		\textbf{Real Positivo} & 48                      & 4                     & 7                       \\
+		\textbf{Real Neutro}   & 202                     & 32                    & 32                      \\
+		\textbf{Real Negativo} & 34                      & 5                     & 9                       \\
+		\hline
+	\end{tabular}
+	\legend{Fonte: Elaborada pelo autor.}
+\end{table}
+
+O OpLexicon alcançou acurácia de 23,86\% e F1-score macro de 22,53\%, indicando desempenho sistematicamente inferior ao classificador aleatório estratificado. A matriz de confusão (\autoref{tab:cm_oplexicon}) revela o principal padrão de falha: 202 das 266 publicações neutras (75,9\%) foram classificadas como positivo, evidenciando uma tendência de atribuir polaridade positiva a publicações jornalísticas factuais cujo vocabulário financeiro não carrega sinal negativo explícito. A classe neutro, dominante no corpus, obteve revocação de apenas 12\%, o que significa que a abordagem léxica é incapaz de identificar o padrão de ausência de sentimento predominante neste tipo de dado.
+
+% ── 4.2.2 SentiLex-PT ────────────────────────────────────────────────────────
+
+\subsection{SentiLex-PT}
+\label{subsec:res_sentilex}
+
+O SentiLex-PT \cite{silva2012sentilex} é um léxico de sentimentos para o português construído a partir de entradas morfologicamente anotadas. Os resultados são apresentados na \autoref{tab:metrics_sentilex}.
+
+\begin{table}[!htbp]
+	\caption[Métricas de desempenho — SentiLex-PT]{Métricas de desempenho do SentiLex-PT ($n = 373$)}
+	\label{tab:metrics_sentilex}
+	\centering
+	\begin{tabular}{lcccc}
+		\hline
+		\textbf{Classe}    & \textbf{Precisão} & \textbf{Revocação} & \textbf{F1-Score} & \textbf{Suporte} \\
+		\hline
+		Positivo           & 0,19              & 0,61               & 0,29              & 59  \\
+		Neutro             & 0,75              & 0,18               & 0,29              & 266 \\
+		Negativo           & 0,20              & 0,50               & 0,28              & 48  \\
+		\hline
+		\textit{Macro avg} & 0,38              & 0,43               & 0,29              & 373 \\
+		\textit{Acurácia}  & ---               & ---                & 0,29              & 373 \\
+		\hline
+	\end{tabular}
+	\legend{Fonte: Elaborada pelo autor.}
+\end{table}
+
+\begin{table}[!htbp]
+	\caption[Matriz de confusão — SentiLex-PT]{Matriz de confusão do SentiLex-PT. Linhas: rótulo verdadeiro; colunas: rótulo predito.}
+	\label{tab:cm_sentilex}
+	\centering
+	\begin{tabular}{lccc}
+		\hline
+		& \textbf{Pred. Positivo} & \textbf{Pred. Neutro} & \textbf{Pred. Negativo} \\
+		\hline
+		\textbf{Real Positivo} & 36                      & 6                     & 17                      \\
+		\textbf{Real Neutro}   & 138                     & 48                    & 80                      \\
+		\textbf{Real Negativo} & 14                      & 10                    & 24                      \\
+		\hline
+	\end{tabular}
+	\legend{Fonte: Elaborada pelo autor.}
+\end{table}
+
+O SentiLex-PT obteve acurácia de 33,51\% e F1-score macro de 30,79\%, ligeiramente superior ao OpLexicon, mas ainda muito abaixo de um classificador por maioria de classe (\textit{majority class baseline}). A matriz de confusão (\autoref{tab:cm_sentilex}) evidencia que 127 das 266 publicações neutras (47,7\%) foram classificadas como positivo, padrão análogo ao observado no OpLexicon. A revocação da classe neutra é igualmente baixa (28\%), confirmando a dificuldade estrutural de abordagens léxicas em reconhecer ausência de polaridade em textos de caráter informativo. O SentiLex-PT distribui mais erros entre positivo e negativo do que o OpLexicon, refletindo diferenças na cobertura léxica de cada recurso.
+
+O SentiLex-PT obteve acurácia de 28,95\% e F1-score macro de 28,88\%, ligeiramente superior ao OpLexicon, mas ainda muito abaixo de um classificador por maioria de classe (\textit{majority class baseline}). A matriz de confusão (\autoref{tab:cm_sentilex}) evidencia que 138 das 266 publicações neutras (51,9\%) foram classificadas como positivo, padrão análogo ao observado no OpLexicon. A revocação da classe neutra é igualmente baixa (18\%), confirmando a dificuldade estrutural de abordagens léxicas em reconhecer ausência de polaridade em textos de caráter informativo. O SentiLex-PT distribui mais erros entre positivo e negativo do que o OpLexicon, refletindo diferenças na cobertura léxica de cada recurso.
+
+% ── 4.2.3 FinBERT-PT-BR ──────────────────────────────────────────────────────
+
+\subsection{FinBERT-PT-BR}
+\label{subsec:res_finbert}
+
+O FinBERT-PT-BR \cite{santos2023finbert} é um modelo BERT especializado para o domínio financeiro em língua portuguesa, pré-treinado sobre corpus de notícias financeiras. Neste trabalho, o modelo é utilizado em modo de inferência direta (\textit{zero-shot} em relação ao corpus local), sem qualquer ajuste sobre as publicações coletadas, conforme descrito na \autoref{subsubsec:implementacao_finbert}. Os resultados são apresentados na \autoref{tab:metrics_finbert}.
+
+
+\begin{table}[!htbp]
+	\caption[Métricas de desempenho — FinBERT-PT-BR]{Métricas de desempenho do FinBERT-PT-BR ($n = 373$)}
+	\label{tab:metrics_finbert}
+	\centering
+	\begin{tabular}{lcccc}
+		\hline
+		\textbf{Classe}    & \textbf{Precisão} & \textbf{Revocação} & \textbf{F1-Score} & \textbf{Suporte} \\
+		\hline
+		Positivo           & 0,41              & 0,47               & 0,44              & 59  \\
+		Neutro             & 0,88              & 0,30               & 0,45              & 266 \\
+		Negativo           & 0,20              & 0,88               & 0,32              & 48  \\
+		\hline
+		\textit{Macro avg} & 0,49              & 0,55               & 0,40              & 373 \\
+		\textit{Acurácia}  & ---               & ---                & 0,40              & 373 \\
+		\hline
+	\end{tabular}
+	\legend{Fonte: Elaborada pelo autor.}
+\end{table}
+
+\begin{table}[!htbp]
+	\caption[Matriz de confusão — FinBERT-PT-BR]{Matriz de confusão do FinBERT-PT-BR. Linhas: rótulo verdadeiro; colunas: rótulo predito.}
+	\label{tab:cm_finbert}
+	\centering
+	\begin{tabular}{lccc}
+		\hline
+		& \textbf{Pred. Positivo} & \textbf{Pred. Neutro} & \textbf{Pred. Negativo} \\
+		\hline
+		\textbf{Real Positivo} & 28                      & 7                     & 24                      \\
+		\textbf{Real Neutro}   & 39                      & 81                    & 146                     \\
+		\textbf{Real Negativo} & 2                       & 4                     & 42                      \\
+		\hline
+	\end{tabular}
+	\legend{Fonte: Elaborada pelo autor.}
+\end{table}
+
+O FinBERT-PT-BR alcançou acurácia de 45,58\% e F1-score macro de 43,20\%, um resultado superior às abordagens léxicas, mas distante do desempenho documentado pelos autores do modelo sobre o corpus de notícias financeiras de treinamento \cite{santos2023finbert}. O padrão mais relevante na \autoref{tab:cm_finbert} é o viés pronunciado em favor da classe negativo: o modelo classificou 145 das 266 publicações neutras (54,5\%) e 27 das 59 positivas (45,8\%) como negativo, atingindo revocação de 88\% nessa classe à custa de precisão de apenas 20\%. Esse comportamento indica que o modelo generaliza excessivamente o padrão negativo aprendido a partir do corpus de notícias formais --- no qual termos como ``queda'', ``perda'' e ``risco'' são indicadores frequentes de sentimento negativo --- para publicações de formato editorial curto do X/Twitter, nas quais o mesmo vocabulário aparece recorrentemente em contextos factuais e neutros.
+
+O FinBERT-PT-BR alcançou acurácia de 40,48\% e F1-score macro de 40,44\%, um resultado superior às abordagens léxicas, mas distante do desempenho documentado pelos autores do modelo sobre o corpus de notícias financeiras de treinamento \cite{santos2023finbert}. O padrão mais relevante na \autoref{tab:cm_finbert} é o viés pronunciado em favor da classe negativo: o modelo classificou 146 das 266 publicações neutras (54,9\%) e 24 das 59 positivas (40,7\%) como negativo, atingindo revocação de 88\% nessa classe à custa de precisão de apenas 20\%. Esse comportamento indica que o modelo generaliza excessivamente o padrão negativo aprendido a partir do corpus de notícias formais --- no qual termos como ``queda'', ``perda'' e ``risco'' são indicadores frequentes de sentimento negativo --- para publicações de formato editorial curto do X/Twitter, nas quais o mesmo vocabulário aparece recorrentemente em contextos factuais e neutros.
+
+% ── 4.2.4 BERTimbau ──────────────────────────────────────────────────────────
+
+\subsection{BERTimbau Ajustado}
+\label{subsec:res_bertimbau}
+
+O BERTimbau (\texttt{neuralmind/bert-base-portuguese-cased}) \cite{souza2020} foi submetido a \textit{fine-tuning} sobre a partição de treinamento do corpus rotulado, conforme o protocolo descrito na \autoref{subsubsec:finetuning_bertimbau}. Os resultados, apresentados na \autoref{tab:metrics_bertimbau}, revelam desempenho amplamente superior às demais abordagens avaliadas.
+
+\begin{table}[!htbp]
+	\caption[Métricas de desempenho — BERTimbau ajustado]{Métricas de desempenho do BERTimbau ajustado ($n = 373$)}
+	\label{tab:metrics_bertimbau}
+	\centering
+	\begin{tabular}{lcccc}
+		\hline
+		\textbf{Classe}    & \textbf{Precisão} & \textbf{Revocação} & \textbf{F1-Score} & \textbf{Suporte} \\
+		\hline
+		Positivo           & 0,85              & 0,76               & 0,80              & 59  \\
+		Neutro             & 0,90              & 0,97               & 0,93              & 266 \\
+		Negativo           & 0,89              & 0,65               & 0,75              & 48  \\
+		\hline
+		\textit{Macro avg} & 0,88              & 0,79               & 0,83              & 373 \\
+		\textit{Acurácia}  & ---               & ---                & 0,89              & 373 \\
+		\hline
+	\end{tabular}
+	\legend{Fonte: Elaborada pelo autor.}
+\end{table}
+
+
+\begin{table}[!htbp]
+	\caption[Matriz de confusão — BERTimbau ajustado]{Matriz de confusão do BERTimbau ajustado. Linhas: rótulo verdadeiro; colunas: rótulo predito.}
+	\label{tab:cm_bertimbau}
+	\centering
+	\begin{tabular}{lccc}
+		\hline
+		& \textbf{Pred. Positivo} & \textbf{Pred. Neutro} & \textbf{Pred. Negativo} \\
+		\hline
+		\textbf{Real Positivo} & 45                      & 12                    & 2                       \\
+		\textbf{Real Neutro}   & 7                       & 257                   & 2                       \\
+		\textbf{Real Negativo} & 1                       & 16                    & 31                      \\
+		\hline
+	\end{tabular}
+	\legend{Fonte: Elaborada pelo autor.}
+\end{table}
+
+
+O BERTimbau ajustado alcançou acurácia de 89,28\% e F1-score macro de 82,78\%, representando ganhos absolutos de 48,8 pontos percentuais em acurácia e 42,3 pontos em F1-score macro em relação ao FinBERT-PT-BR. A matriz de confusão (\autoref{tab:cm_bertimbau}) evidencia que o modelo distribuiu os erros de forma muito mais equilibrada entre as três classes: 257 das 266 instâncias neutras (96,6\%) foram corretamente classificadas, 45 das 59 positivas (76,3\%) e 31 das 48 negativas (64,6\%). Diferentemente do FinBERT-PT-BR, o BERTimbau ajustado não apresenta viés sistemático em favor de nenhuma classe; os erros residuais concentram-se principalmente em confusão entre neutro e as classes minoritárias (12 positivos classificados como neutro e 16 negativos como neutro), um padrão esperado dado o desequilíbrio de classes no corpus.

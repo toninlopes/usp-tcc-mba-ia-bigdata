@@ -1,0 +1,98 @@
+% ============================================================
+%  USPSC-Cap4-Avaliacao_Experimental_4.1-Configuracao_Experimental.tex
+%  Seção 4.1 — Configuração Experimental
+% ============================================================
+
+\section{Configuração Experimental}
+\label{sec:config_experimental}
+
+\subsection{Conjunto de Teste}
+\label{subsec:conjunto_teste}
+
+A avaliação comparativa foi realizada sobre um conjunto de teste composto por 373 publicações, extraídas do subconjunto rotulado manualmente conforme o protocolo de anotação descrito na \autoref{sec:rotulagem}. O conjunto corresponde à partição de teste (15\%) obtida por particionamento estratificado com \texttt{random\_state=42}, conforme detalhado na \autoref{subsec:particionamento}. A estratificação preservou a distribuição original das três classes de sentimento no corpus rotulado, resultando na composição apresentada na \autoref{tab:distribuicao_teste}.
+
+\begin{table}[!htbp]
+	\caption[Distribuição de classes no conjunto de teste]{Distribuição de classes no conjunto de teste ($n = 373$)}
+	\label{tab:distribuicao_teste}
+	\centering
+	\begin{tabular}{lcc}
+		\hline
+		\textbf{Classe} & \textbf{Instâncias} & \textbf{Proporção} \\
+		\hline
+		Positivo  & 59  & 15,8\% \\
+		Neutro    & 266 & 71,3\% \\
+		Negativo  & 48  & 12,9\% \\
+		\hline
+		\textbf{Total} & \textbf{373} & \textbf{100,0\%} \\
+		\hline
+	\end{tabular}
+	\legend{Fonte: Elaborada pelo autor.}
+\end{table}
+
+A predominância da classe neutra (71,3\%) é consistente com o caráter editorial e factual das publicações dos veículos analisados, conforme discutido na \autoref{subsec:lim_representatividade}, e constitui um fator relevante na interpretação das métricas de cada abordagem, em particular do F1-score macro, que é calculado sem ponderação pelo tamanho de cada classe.
+
+\subsection{Protocolo de Avaliação}
+\label{subsec:protocolo_avaliacao}
+
+Todas as quatro abordagens avaliadas — OpLexicon~v3.0, SentiLex-PT, FinBERT-PT-BR e BERTimbau ajustado --- foram aplicadas exatamente ao mesmo conjunto de 373 instâncias de teste, sem que qualquer abordagem tenha tido acesso a esses exemplos durante o desenvolvimento ou o treinamento. Para o BERTimbau ajustado, o particionamento estratificado garantiu que os exemplos de teste nunca fizeram parte das partições de treinamento (70\%) ou de validação (15\%) utilizadas no \textit{fine-tuning}.
+
+As abordagens léxicas (OpLexicon e SentiLex-PT) e o FinBERT-PT-BR operam de forma determinística e não consomem dados de treinamento do corpus local; portanto, sua avaliação no conjunto de teste é direta e não sujeita a viés de vazamento (\textit{data leakage}). As métricas calculadas para cada abordagem são as definidas na \autoref{subsec:metricas_avaliacao}: acurácia, precisão, revocação e F1-score por classe, F1-score macro e matriz de confusão. A implementação do protocolo de avaliação está centralizada no módulo \texttt{app/core/evaluation/metrics.py}, invocado via a função \texttt{evaluate(classificator)}.
+
+\subsection{Configuração do Fine-Tuning do BERTimbau}
+\label{subsec:config_finetuning}
+
+O processo de \textit{fine-tuning} do BERTimbau, descrito em detalhes na \autoref{subsubsec:finetuning_bertimbau}, foi executado com os hiperparâmetros consolidados no \autoref{qua:hiperparametros_bertimbau}.
+
+
+\begin{quadro}[!htbp]
+	\caption[Hiperparâmetros do fine-tuning do BERTimbau]{Hiperparâmetros utilizados no \textit{fine-tuning} do BERTimbau}
+	\label{qua:hiperparametros_bertimbau}
+	\centering
+	\begin{tabular}{ll}
+		\hline
+		\textbf{Hiperparâmetro} & \textbf{Valor} \\
+		\hline
+		Modelo base                          & \texttt{neuralmind/bert-base-portuguese-cased} \\
+		Taxa de aprendizado                  & $5 \times 10^{-5}$ \\
+		Tamanho do batch                     & 8 \\
+		Número máximo de épocas              & 12 \\
+		Comprimento máximo (\textit{tokens}) & 512 \\
+		\textit{Warmup ratio}                & 0,10 \\
+		\textit{Weight decay}                & 0,01 \\
+		\textit{Early stopping}              & Paciência de 2 épocas (F1 macro na dobra de validação) \\
+		Validação cruzada                    & 4 dobras estratificadas (\textit{best fold}: 1, F1 macro val. = 90,00\%) \\
+		Função de perda                      & \texttt{CrossEntropyLoss} com pesos de classe balanceados \\
+		Semente aleatória                    & 42 \\
+		\hline
+	\end{tabular}
+	\legend{Fonte: Elaborada pelo autor.}
+\end{quadro}
+
+
+O desbalanceamento de classes foi mitigado por meio de uma subclasse personalizada do \texttt{Trainer} da biblioteca \textit{HuggingFace Transformers} \cite{wolf2020transformers} (\texttt{WeightedTrainer}), que recalcula a função de perda com pesos inversamente proporcionais à frequência de cada classe, calculados via \texttt{compute\_class\_weight('balanced')} do scikit-learn. O treinamento foi executado sobre a partição de 70\% do corpus rotulado, com monitoramento sobre a partição de validação (15\%) para ativação do \textit{early stopping}.
+
+\subsection{Ambiente Computacional}
+\label{subsec:ambiente}
+
+O \textit{pipeline} de avaliação foi executado em ambiente Python 3.11, com as principais dependências listadas no \autoref{qua:dependencias}.
+
+\begin{quadro}[!htbp]
+	\caption[Principais dependências do ambiente de execução]{Principais dependências do ambiente de execução}
+	\label{qua:dependencias}
+	\centering
+	\begin{tabular}{ll}
+		\hline
+		\textbf{Biblioteca} & \textbf{Finalidade} \\
+		\hline
+		\texttt{transformers} (HuggingFace) & Carregamento e inferência dos modelos BERT \\
+		\texttt{scikit-learn}               & Métricas de avaliação e pesos de classe \\
+		\texttt{torch} (PyTorch)            & Backend de treinamento e inferência neural \\
+		\texttt{pandas} / \texttt{numpy}    & Manipulação de dados e matrizes \\
+		\texttt{psycopg2}                   & Acesso ao banco de dados PostgreSQL \\
+		\texttt{loguru}                     & Registro de eventos do \textit{pipeline} \\
+		\hline
+	\end{tabular}
+	\legend{Fonte: Elaborada pelo autor.}
+\end{quadro}
+
+O banco de dados PostgreSQL foi provisionado em contêiner Docker, e os artefatos do \textit{fine-tuning} do BERTimbau --- incluindo a matriz de confusão e o relatório de classificação do conjunto de teste --- foram persistidos no diretório \texttt{models/bert-timbau-sentiment/eval/} do repositório do \textit{pipeline}.

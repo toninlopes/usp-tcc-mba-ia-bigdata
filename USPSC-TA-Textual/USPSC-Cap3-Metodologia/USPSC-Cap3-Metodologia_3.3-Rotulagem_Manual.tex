@@ -31,13 +31,13 @@ A separação entre relevância financeira e polaridade de sentimento em etapas 
 \subsection{Ferramenta de Anotação}
 \label{subsec:ferramenta_anotacao}
 
-A ferramenta de anotação constitui o segundo estágio do \textit{pipeline} (\texttt{pipeline/02\_annotation/}) e é composta por dois arquivos:
+A ferramenta de anotação constitui o segundo estágio do \textit{pipeline} (\texttt{app/dashboard/}) e é composta por dois arquivos:
 
 \begin{itemize}
-	\item \texttt{pipeline/02\_annotation/app.py}: \textit{launcher} multi-página Streamlit, invocado via \texttt{streamlit run pipeline/02\_annotation/app.py} (acessível em \texttt{http://localhost:8501}). Agrega em uma única interface três páginas: \textit{Classification} (\texttt{classifier.py}), \textit{Analytics} (\texttt{pipeline/03\_eda/dashboard.py}) e \textit{Exploração dos Dados} (\texttt{pipeline/03\_eda/eda.py}), permitindo ao anotador alternar entre a tarefa de rotulagem e a inspeção dos dados sem trocar de aplicação;
+	\item \texttt{app/dashboard/app.py}: \textit{launcher} multi-página Streamlit, invocado via \texttt{streamlit run app/dashboard/app.py} (acessível em \texttt{http://localhost:8501}). Agrega em uma única interface três páginas: \textit{Classification} (\texttt{classifier.py}), \textit{Analytics} (\texttt{app/dashboard/pages/eda.py}) e \textit{Exploração dos Dados} (\texttt{app/dashboard/pages/exploration.py}), permitindo ao anotador alternar entre a tarefa de rotulagem e a inspeção dos dados sem trocar de aplicação;
 	
-	\item \texttt{pipeline/02\_annotation/classifier.py}: página principal de anotação, que implementa a interface de classificação tweet a tweet e obtém os dados diretamente do banco de dados via
-	\texttt{shared/database.py}.
+	\item \texttt{app/dashboard/pages/annotation.py}: página principal de anotação, que implementa a interface de classificação tweet a tweet e obtém os dados diretamente do banco de dados via
+	\texttt{app/shared/db/database.py}.
 \end{itemize}
 
 A interface de classificação é composta por três componentes principais:
@@ -71,19 +71,89 @@ Cada decisão de classificação é persistida em duas estruturas complementares
 
 O corpus rotulado manualmente cumpre, neste trabalho, dois propósitos metodológicos distintos: (i) constitui o conjunto de referência (\textit{gold standard}) utilizado na avaliação comparativa das abordagens de classificação descritas na \autoref{sec:abordagens}; e (ii) é a fonte de exemplos supervisionados para o \textit{fine-tuning} de modelos pré-treinados ajustados localmente, como o BERTimbau (\autoref{subsec:bertimbau}). Esse duplo uso impõe uma decisão de protocolo: para que a comparação entre abordagens que viram os rótulos durante o treinamento (e.g., BERTimbau ajustado) e abordagens que não os viram (e.g., FinBERT-PT-BR e métodos léxicos) seja metodologicamente honesta, todas as abordagens devem ser avaliadas sobre o \textbf{mesmo subconjunto de teste}, definido a priori, antes de qualquer treinamento \cite{jurafsky2026,caseli2024cap1}.
 
-Adota-se, para tanto, um particionamento estratificado em três conjuntos disjuntos --- \textbf{treinamento} (70\%), \textbf{validação} (15\%) e \textbf{teste} (15\%) ---, gerado por meio da função \texttt{train\_test\_split} da biblioteca \texttt{scikit-learn}, com semente aleatória fixa (\texttt{random\_state=42}) e estratificação pela classe de polaridade. A estratificação preserva a distribuição original das três classes (positivo, neutro, negativo) em cada conjunto, o que é particularmente relevante dado o desbalanceamento esperado no corpus em favor da classe neutra, característico de publicações jornalísticas de natureza factual \cite{loughran2011}. O particionamento é realizado uma única vez e os identificadores das publicações em cada partição são persistidos em arquivos auxiliares, garantindo que todas as abordagens avaliadas operem sobre exatamente os mesmos exemplos de teste.
+O particionamento é gerenciado pela classe \texttt{DatasetSplitRepository} (\texttt{app/shared/db/dataset\_split.py}), que implementa o método \texttt{assign\_split()} e persiste o resultado na tabela \texttt{dataset\_split}. A operação é idempotente: uma vez realizada, é reutilizada por todas as execuções subsequentes do \textit{pipeline}; o parâmetro \texttt{force=True} permite regenerá-la caso o corpus rotulado seja ampliado. A \autoref{tab:dataset_split} descreve o esquema da tabela.
 
-A função analítica de cada partição é a seguinte:
+\begin{table}[!htbp]
+	\caption{Esquema da tabela \texttt{dataset\_split}}
+	\label{tab:dataset_split}
+	\centering
+	\begin{tabular}{llp{8.2cm}}
+		\hline
+		\textbf{Coluna} & \textbf{Tipo} & \textbf{Descrição} \\
+		\hline
+		\texttt{tweet\_id} & INTEGER & Chave estrangeira para \texttt{tweets.id}; único na tabela \\
+		\texttt{split}     & VARCHAR & \texttt{'train'} ou \texttt{'test'} \\
+		\texttt{fold}      & SMALLINT & Fold do K-Fold ($1$--$4$) quando \texttt{split='train'}; \texttt{NULL} quando \texttt{split='test'} \\
+		\hline
+	\end{tabular}
+	\legend{Fonte: Elaborado pelo autor.}
+\end{table}
 
-\begin{itemize}
-	\item \textbf{Treinamento (70\%)}: utilizado exclusivamente pelas abordagens que requerem aprendizado supervisionado a partir do corpus local (e.g., \textit{fine-tuning} do BERTimbau). Abordagens léxicas e o FinBERT-PT-BR não consomem esta partição;
+O procedimento compreende duas etapas sequenciais, ambas com estratificação pela classe de polaridade e semente aleatória fixa (\texttt{random\_state=42}), que preserva a distribuição original das três classes em cada conjunto — condição particularmente relevante dado o desbalanceamento esperado em favor da classe neutra, característico de publicações jornalísticas de natureza factual \cite{loughran2011}:
+
+\begin{enumerate}
+	\item \textbf{Hold-out de teste} ($\approx$~15\%): por meio de \texttt{train\_test\_split} com estratificação pelo sentimento, extrai-se um subconjunto fixo reservado exclusivamente para a avaliação comparativa final. Os registros recebem \texttt{split=`test'} e \texttt{fold=NULL}. Nenhum classificador — incluindo o BERTimbau — tem acesso a esses registros durante o treinamento, garantindo que as estimativas de desempenho reportadas no \autoref{Cap:Ava_Exp} sejam livres de viés de seleção;
 	
-	\item \textbf{Validação (15\%)}: utilizada durante o \textit{fine-tuning} para seleção de \textit{checkpoints}, ajuste de hiperparâmetros e ativação do critério de \textit{early stopping}. Não é utilizada na avaliação final reportada nos resultados;
-	
-	\item \textbf{Teste (15\%)}: constitui o \textit{gold standard} efetivo da avaliação comparativa. Todas as abordagens descritas na \autoref{sec:abordagens} --- léxicas, FinBERT-PT-BR e BERTimbau ajustado --- são avaliadas sobre exatamente este conjunto, e somente sobre ele, no cálculo das métricas reportadas no \autoref{Cap:Ava_Exp}.
-\end{itemize}
+	\item \textbf{Conjunto de treinamento} ($\approx$~85\%): os registros restantes recebem \texttt{split=`train'} e são subdivididos em $K=4$ folds por validação cruzada estratificada (\texttt{StratifiedKFold}, \texttt{shuffle=True}, \texttt{random\_state=42}), cada um marcado com \texttt{fold}~$\in \{1, 2, 3, 4\}$. Esse conjunto é utilizado exclusivamente pelo protocolo de \textit{fine-tuning} do BERTimbau, detalhado na \autoref{subsubsec:arquitetura_bertimbau}; os demais classificadores (OpLexicon, SentiLex-PT e FinBERT-PT-BR) não requerem dados de treinamento e, portanto, não dependem dessa subdivisão.
+\end{enumerate}
 
-A fixação da semente aleatória e a persistência dos identificadores de cada partição asseguram a reprodutibilidade integral do protocolo: qualquer execução subsequente do \textit{pipeline} sobre o mesmo corpus rotulado recupera os mesmos conjuntos, condição necessária para que comparações entre abordagens introduzidas em momentos distintos da pesquisa permaneçam metodologicamente consistentes.
+A \autoref{fig:dataset_split} ilustra a estrutura resultante do particionamento.
+
+\begin{figure}[!htb]
+	\centering
+	\caption{\label{fig:dataset_split}Estrutura do particionamento estratificado do corpus rotulado}
+	\resizebox{0.82\textwidth}{!}{%
+		\begin{tikzpicture}
+			[
+				box/.style   = {rectangle, rounded corners=3pt, draw=black,fill=gray!12, align=center, minimum height=1.0cm,font=\small},
+				fold/.style  = {rectangle, rounded corners=3pt, draw=black!60, fill=gray!5,  align=center, minimum height=0.9cm, font=\small},
+				lbl/.style   = {font=\scriptsize, align=center},
+				node distance = 0.35cm and 0.4cm
+			]
+			
+			%% Corpus total
+			\node[box, text width=11.5cm, minimum height=1.1cm]
+			(corpus){Corpus rotulado (tweets financeiros com anotação humana)};
+			
+			%% Hold-out
+			\node[box, text width=3.0cm, below left=0.9cm and 1.8cm of corpus,
+			fill=gray!25] (test)
+			{Hold-out\\$\approx$~15\%\\\texttt{split=`test'}};
+			
+			%% Train pool
+			\node[box, text width=7.8cm, below right=0.9cm and -1.0cm of corpus]
+			(train) {Conjunto de treinamento~$\approx$~85\%\quad\texttt{split=`train'}};
+			
+			%% Folds
+			\node[fold, text width=1.55cm, below=0.6cm of train, xshift=-2.7cm]
+			(f1) {Fold 1\\\texttt{fold=1}};
+			\node[fold, text width=1.55cm, right=0.35cm of f1] (f2)
+			{Fold 2\\\texttt{fold=2}};
+			\node[fold, text width=1.55cm, right=0.35cm of f2] (f3)
+			{Fold 3\\\texttt{fold=3}};
+			\node[fold, text width=1.55cm, right=0.35cm of f3] (f4)
+			{Fold 4\\\texttt{fold=4}};
+			
+			%% Arrows
+			\draw[->, thick] (corpus.south) -- ++(0,-0.4) -| (test.north);
+			\draw[->, thick] (corpus.south) -- ++(0,-0.4) -| (train.north);
+			\draw[->, thick] (train.south)  -- ++(0,-0.3) -| (f1.north);
+			\draw[->, thick] (train.south)  -- ++(0,-0.3) -| (f2.north);
+			\draw[->, thick] (train.south)  -- ++(0,-0.3) -| (f3.north);
+			\draw[->, thick] (train.south)  -- ++(0,-0.3) -| (f4.north);
+			
+			%% Labels
+			\node[lbl, above right=0.05cm and 0.1cm of test.north east]
+			{\texttt{random\_state=42}\\estratificado por sentimento};
+			\node[lbl, below=0.15cm of f2.south, xshift=0.95cm]
+			{\texttt{StratifiedKFold}$(K=4,\;\texttt{shuffle=True},\;\texttt{random\_state=42})$};
+			
+		\end{tikzpicture}%
+	}
+	\legend{Fonte: Elaborado pelo autor.}
+\end{figure}
+
+A fixação da semente aleatória e a persistência dos identificadores na tabela \texttt{dataset\_split} asseguram a reprodutibilidade integral do protocolo: qualquer execução subsequente do \textit{pipeline} sobre o mesmo corpus rotulado recupera os mesmos conjuntos, condição necessária para que comparações entre abordagens introduzidas em momentos distintos da pesquisa permaneçam metodologicamente consistentes.
 
 
 \subsection{Limitações do Processo de Rotulagem}
