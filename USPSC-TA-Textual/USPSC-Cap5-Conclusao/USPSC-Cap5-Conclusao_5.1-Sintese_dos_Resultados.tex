@@ -1,0 +1,23 @@
+% ============================================================
+% USPSC-Cap5-Conclusao_5.1-Sintese_dos_Resultados.tex
+% Seção 5.1 — Síntese dos Resultados
+% ============================================================
+
+\section{Síntese dos Resultados}
+\label{sec:sintese_resultados}
+
+Este trabalho propôs e implementou um pipeline de Processamento de Linguagem Natural (PLN) de ponta a ponta para análise de sentimento de publicações financeiras em língua portuguesa no X/Twitter, com foco no mercado financeiro brasileiro. Os cinco objetivos específicos estabelecidos na \autoref{sec:objetivos} foram integralmente cumpridos.
+
+O primeiro objetivo --- coletar e estruturar um dataset de publicações dos veículos InfoMoney e InvestingBrasil no período de outubro de 2025 a fevereiro de 2026 --- foi cumprido por meio da integração com a API do X/Twitter v2, resultando em um corpus de publicações em língua portuguesa com conteúdo relacionado ao mercado financeiro, descrito em detalhes na \autoref{sec:fonte_dados}.
+
+O segundo objetivo --- realizar Análise Exploratória dos Dados (AED) e aplicar técnicas de pré-processamento para detecção e remoção de dados redundantes e \textit{outliers} --- foi atendido conforme documentado nas \autoref{sec:eda} e \autoref{sec:preprocessamento}. A AED evidenciou que o corpus apresenta distribuição de comprimento compatível com o formato de publicações do X/Twitter e que a proporção de instâncias neutras (71,3\% no conjunto de teste) é característica estrutural do gênero editorial financeiro.
+
+O terceiro objetivo --- desenvolver um pipeline de pré-processamento e análise de sentimento baseado em PLN --- foi cumprido com a implementação do pipeline integrado descrito na \autoref{sec:pipeline}, que abrange desde a coleta até a classificação de sentimento, com dois fluxos de pré-processamento distintos conforme a família do classificador (\autoref{sec:preprocessamento}).
+
+O quarto objetivo --- avaliar e comparar o desempenho de diferentes abordagens de classificação --- constitui o núcleo experimental do trabalho e foi tratado nos Capítulos \ref{Cap:Metodologia} e \ref{Cap:Ava_Exp}. Os resultados consolidados na \autoref{tab:comparativa_geral} estabelecem uma hierarquia clara de desempenho entre as quatro abordagens avaliadas sobre o mesmo conjunto de teste ($n = 373$): OpLexicon~v3.0 (F1-score macro 0,23; acurácia 0,24) $<$ SentiLex-PT (F1-score macro 0,29; acurácia 0,29) $<$ FinBERT-PT-BR (F1-score macro 0,40; acurácia 0,40) $\ll$ BERTimbau ajustado (F1-score macro 0,83; acurácia 0,89).
+
+O achado central do experimento é que o \textit{fine-tuning} local do BERTimbau sobre o corpus rotulado --- constituído por publicações do mesmo gênero e subdomínio avaliados --- produziu ganhos expressivos mesmo em relação ao modelo com especialização prévia de domínio financeiro: o BERTimbau ajustado superou o FinBERT-PT-BR em 43 pontos percentuais de F1-score macro e 49 pontos percentuais de acurácia. Esse resultado confirma que a proximidade entre os dados de ajuste e os dados de inferência é um fator determinante para o desempenho em tarefas de classificação de sentimento em gêneros textuais específicos \cite{devlin2019}, e que a especialização de domínio prévia não substitui a adaptação ao gênero quando o alvo de inferência difere estruturalmente do corpus de pré-treinamento.
+
+As abordagens léxicas --- OpLexicon e SentiLex-PT --- não alcançaram desempenho superior ao classificador por maioria de classe (\textit{majority class baseline}), que obteria acurácia de 71,3\% ao classificar todas as instâncias como neutro. Esse resultado decorre da natureza predominantemente factual e informativa das publicações jornalísticas financeiras, cujo vocabulário carece de marcadores explícitos de polaridade e exige dicionário específico para a correta identificação de sentimento \cite{loughran2011,liu2020survey}.
+
+O quinto objetivo --- caracterizar descritivamente o dataset e identificar padrões de distribuição de polaridade --- foi cumprido na \autoref{sec:eda} e complementado pela análise de distribuição das predições na \autoref{sec:resultados_abordagem}.

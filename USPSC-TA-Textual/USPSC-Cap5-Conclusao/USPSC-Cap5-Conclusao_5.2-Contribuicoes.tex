@@ -1,0 +1,26 @@
+% ============================================================
+% USPSC-Cap5-Conclusao_5.2-Contribuicoes.tex
+% Seção 5.2 — Contribuições
+% ============================================================
+
+\section{Contribuições}
+\label{sec:contribuicoes}
+
+As contribuições deste trabalho podem ser organizadas em três dimensões: científica, metodológica e prática.
+
+\subsection{Contribuição Científica}
+\label{subsec:contrib_cientifica}
+
+Do ponto de vista científico, este trabalho contribui com uma avaliação comparativa sistemática de quatro abordagens de análise de sentimento --- duas baseadas em léxico (OpLexicon~v3.0 e SentiLex-PT) e duas baseadas em modelos de linguagem pré-treinados (FinBERT-PT-BR e BERTimbau ajustado) --- aplicadas a um corpus de publicações financeiras em língua portuguesa do X/Twitter. A literatura nacional sobre análise de sentimento aplicada ao mercado financeiro brasileiro permanece incipiente \cite{galdi2018}, e comparações controladas entre abordagens léxicas e neurais sobre o mesmo corpus de tweets financeiros em português são escassas. Os resultados documentados neste trabalho fornecem evidências empíricas sobre a inadequação das abordagens léxicas de domínio geral para esse tipo de corpus e sobre a magnitude dos ganhos obtidos pelo ajuste local de gênero em modelos BERT, contribuindo para o debate metodológico sobre estratégias de especialização de modelos de linguagem \cite{devlin2019,santos2023finbert}.
+
+Adicionalmente, o corpus rotulado produzido --- com anotação de polaridade (positivo, neutro, negativo) para publicações financeiras em português do X/Twitter --- representa um recurso de dados para o domínio financeiro brasileiro, em linha com iniciativas como o FinBERT-PT-BR \cite{santos2023finbert}, que enfrentam restrições quanto ao tamanho das bases anotadas manualmente.
+
+\subsection{Contribuição Metodológica}
+\label{subsec:contrib_metodologica}
+
+Do ponto de vista metodológico, este trabalho propõe e documenta um protocolo reproduzível de ponta a ponta para análise de sentimento de publicações financeiras em português, abrangendo: coleta estruturada via API do X/Twitter~v2; análise exploratória e controle de qualidade do corpus; dois fluxos de pré-processamento distintos para abordagens léxicas e neurais; rotulagem manual com critérios explícitos; e avaliação experimental com conjunto de teste fixo e métricas padronizadas (acurácia, precisão, revocação, F1-score por classe e F1-score macro). O pipeline está disponível publicamente em repositório aberto\footnote{\url{https://github.com/toninlopes/usp-tcc-pipeline-mba-ia-bigdata}}, permitindo que pesquisadores reproduzam, estendam ou adaptem o protocolo a outros corpora, veículos ou períodos de análise.
+
+\subsection{Contribuição Prática}
+\label{subsec:contrib_pratica}
+
+Do ponto de vista prático, o pipeline implementado oferece à comunidade acadêmica e a profissionais do mercado financeiro uma ferramenta para monitoramento e quantificação automatizada do sentimento em publicações de veículos especializados. A capacidade de processar grandes volumes de publicações em tempo próximo ao real, classificando sua polaridade de forma sistemática, representa um recurso relevante para analistas que buscam incorporar informação não estruturada à sua leitura do ambiente econômico \cite{tetlock2007,kearney2014}. Os resultados indicam que o BERTimbau ajustado é a única abordagem avaliada com desempenho suficiente para uso prático nesse contexto, tendo atingido acurácia de 89,28\% e F1-score macro de 82,78\% sobre o conjunto de teste.
