@@ -1,0 +1,15 @@
+% ============================================================
+% USPSC-Cap5-Conclusao_5.3-Limitacoes.tex
+% Seção 5.3 — Limitações
+% ============================================================
+
+\section{Limitações}
+\label{sec:limitacoes_conclusao}
+
+As limitações metodológicas e operacionais deste trabalho foram discutidas em detalhes nas \autoref{sec:limitacoes} e \autoref{subsec:discussao_restricoes}. Retomam-se aqui, de forma sintética, as mais relevantes para a correta interpretação dos resultados.
+
+A anotação do corpus foi realizada por um único avaliador, inviabilizando o cálculo de concordância interanotadores (\textit{inter-annotator agreement}). A margem de incerteza associada à qualidade do \textit{gold standard} --- e seu impacto sobre as métricas reportadas --- não é quantificada, o que constitui uma limitação da validade interna do experimento.
+
+O corpus está restrito a dois veículos de mídia financeira institucional (InfoMoney e InvestingBrasil) e a um recorte temporal de aproximadamente quatro meses (outubro de 2025 a fevereiro de 2026), condicionado pelas restrições de acesso à API do X/Twitter v2. Os resultados, portanto, refletem o gênero editorial financeiro desses veículos no período analisado e podem não ser diretamente generalizáveis a outros gêneros textuais do domínio financeiro, como análises de analistas independentes, fóruns de investidores ou comunicados de corretoras.
+
+O corpus de ajuste do BERTimbau é modesto em comparação com os padrões de \textit{fine-tuning} de grande escala; a utilização de conjuntos de dados maiores e de maior diversidade de gênero poderia produzir modelos com desempenho superior, especialmente nas classes minoritárias (positivo e negativo). Por fim, o FinBERT-PT-BR foi avaliado exclusivamente em modo de inferência direta, sem ajuste sobre o corpus local; uma comparação com uma versão ajustada do mesmo modelo constituiria um experimento adicional relevante para isolar o efeito da especialização de domínio do efeito do ajuste de gênero.

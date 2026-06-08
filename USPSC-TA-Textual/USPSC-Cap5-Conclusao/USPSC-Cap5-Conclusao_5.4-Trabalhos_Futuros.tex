@@ -1,0 +1,17 @@
+% ============================================================
+% USPSC-Cap5-Conclusao_5.4-Trabalhos_Futuros.tex
+% Seção 5.4 — Trabalhos Futuros
+% ============================================================
+
+\section{Trabalhos Futuros}
+\label{sec:trabalhos_futuros}
+
+Os resultados e limitações identificados neste trabalho apontam para um conjunto de direcionamentos que podem orientar pesquisas futuras na área de análise de sentimento aplicada ao mercado financeiro brasileiro.
+
+\textbf{Ampliação e diversificação do corpus.} A extensão do corpus a um maior número de veículos especializados --- incluindo corretoras, analistas independentes e fóruns de investidores --- e a períodos de análise mais longos permitiria avaliar a robustez dos modelos a diferentes gêneros textuais do domínio financeiro e a diferentes contextos macroeconômicos. A inclusão de períodos com maior volatilidade de mercado aumentaria a representatividade das classes minoritárias (positivo e negativo) no corpus rotulado.
+
+\textbf{\textit{Fine-tuning} local do FinBERT-PT-BR.} Este trabalho avaliou o FinBERT-PT-BR exclusivamente em modo de inferência direta. O ajuste do modelo sobre o corpus local permitiria isolar o efeito da especialização de domínio do efeito da adaptação de gênero, produzindo uma comparação metodologicamente mais controlada entre as estratégias de especialização. Resultados preliminares na literatura sugerem que o \textit{fine-tuning} de modelos com especialização prévia de domínio sobre dados do gênero-alvo tende a produzir ganhos adicionais significativos \cite{santos2023finbert}.
+
+\textbf{Anotação multi-avaliador com cálculo de concordância.} A construção de um \textit{gold standard} com múltiplos avaliadores e cálculo explícito de concordância interanotadores --- por meio de métricas como o coeficiente Kappa de Cohen ou o Krippendorff's alpha --- elevaria a validade interna do experimento e tornaria o corpus comparável a recursos de referência da área \cite{kearney2014}.
+
+\textbf{Extensão a modelos de linguagem de grande escala.} A avaliação de modelos de linguagem de grande escala (\textit{large language models} --- LLMs) em tarefas de classificação de sentimento financeiro em português, por meio de \textit{prompting} ou ajuste instrucional, representa uma direção de pesquisa relevante, considerando o rápido avanço desses modelos e sua crescente disponibilidade em variantes multilíngues \cite{devlin2019}.
