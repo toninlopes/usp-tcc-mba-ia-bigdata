@@ -18,7 +18,7 @@ ironia e vocabulário específico do domínio não contemplado pelo léxico \cit
 \subsubsection{Escolha do Recurso Léxico}
 \label{subsubsec:escolha_lexico}
 
-O \textbf{OpLexicon v3.0} foi selecionado como léxico principal por duas razões: (i)~abrangência léxica consideravelmente maior (32.191 entradas de \textit{tokens} não lematizados, cobrindo formas coloquiais recorrentes em \textit{tweets}); e (ii)~construção orientada ao português brasileiro, com termos do jargão financeiro local. O \textbf{SentiLex-PT} \cite{silva2012sentilex}, por sua vez, é implementado em paralelo como segunda abordagem léxica (Seção~\ref{subsec:abordagem_sentilex}),  permitindo avaliar o impacto da anotação manual e da cobertura de formas flexionadas sobre o desempenho no domínio financeiro.
+O \textbf{OpLexicon v3.0} foi selecionado como léxico principal por duas razões: (i)~abrangência léxica consideravelmente maior (32.191 entradas de \textit{tokens} não lematizados, cobrindo formas coloquiais recorrentes em \textit{tweets}); e (ii)~construção orientada ao português brasileiro, com termos do jargão financeiro local. O \textbf{SentiLex-PT} \cite{carvalho2015sentilex}, por sua vez, é implementado em paralelo como segunda abordagem léxica (Seção~\ref{subsec:abordagem_sentilex}),  permitindo avaliar o impacto da anotação manual e da cobertura de formas flexionadas sobre o desempenho no domínio financeiro.
 
 
 \subsubsection{Estrutura do Léxico}
@@ -70,10 +70,10 @@ no léxico. Caso $T^{*} = \emptyset$, o texto é classificado como Neutro com es
 \subsubsection{Fundamentação da Escolha}
 \label{subsubsec:justificativa_sentilex}
 
-O \textbf{SentiLex-PT} \cite{silva2012sentilex} foi incorporado como segunda abordagem léxica com o objetivo de ampliar a validade comparativa da avaliação. Enquanto o OpLexicon~v3.0 é construído sobre um processo semiautomático voltado ao português brasileiro, o SentiLex-PT decorre de um esforço de anotação manual, o que lhe confere características complementares relevantes para o domínio financeiro:
+O \textbf{SentiLex-PT} \cite{carvalho2015sentilex} foi incorporado como segunda abordagem léxica com o objetivo de ampliar a validade comparativa da avaliação. Enquanto o OpLexicon~v3.0 é construído sobre um processo semiautomático voltado ao português brasileiro, o SentiLex-PT decorre de um esforço de anotação manual, o que lhe confere características complementares relevantes para o domínio financeiro:
 
 \begin{enumerate}
-	\item \textbf{Anotação manual}: os 7.014 lemas (expandidos para 82.347 formas flexionadas na versão SentiLex-PT02) foram anotados manualmente por especialistas segundo a taxonomia \textit{Manually Annotated} (\texttt{ANOT:MAN}), resultando em um recurso de alta precisão intrínseca \cite{silva2012sentilex};
+	\item \textbf{Anotação manual}: os 7.014 lemas (expandidos para 82.347 formas flexionadas na versão SentiLex-PT02) foram anotados manualmente por especialistas segundo a taxonomia \textit{Manually Annotated} (\texttt{ANOT:MAN}), resultando em um recurso de alta precisão intrínseca \cite{carvalho2015sentilex};
 
 	\item \textbf{Cobertura de formas flexionadas}: a versão SentiLex-PT02, adotada neste trabalho, contém formas nominais, adjetivais e verbais flexionadas, dispensando etapa de lematização e tornando-a mais adequada ao processamento de \textit{tweets} --- textos curtos com vocabulário coloquial e morfologia variada;
 
@@ -116,7 +116,7 @@ O SentiLex-PT02 é distribuído como arquivo de texto simples, com uma entrada p
 		mercado    & N   & MAN & \phantom{$-$}0 \\
 		\hline
 	\end{tabular}
-	\fonte{Adaptado de \citeonline{silva2012sentilex}.}
+	\fonte{Adaptado de \citeonline{carvalho2015sentilex}.}
 \end{table}
 
 \subsubsection{Implementação e Protocolo de Pontuação}
