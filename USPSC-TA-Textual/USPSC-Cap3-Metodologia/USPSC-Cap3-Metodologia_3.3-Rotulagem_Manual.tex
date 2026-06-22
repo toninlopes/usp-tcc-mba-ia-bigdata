@@ -34,10 +34,17 @@ A separação entre relevância financeira e polaridade de sentimento em etapas 
 A ferramenta de anotação constitui o segundo estágio do \textit{pipeline} (\texttt{app/dashboard/}) e é composta por dois arquivos:
 
 \begin{itemize}
-	\item \texttt{app/dashboard/app.py}: \textit{launcher} multi-página Streamlit, invocado via \texttt{streamlit run app/dashboard/app.py} (acessível em \texttt{http://localhost:8501}). Agrega em uma única interface três páginas: \textit{Classification} (\texttt{classifier.py}), \textit{Analytics} (\texttt{app/dashboard/pages/eda.py}) e \textit{Exploração dos Dados} (\texttt{app/dashboard/pages/exploration.py}), permitindo ao anotador alternar entre a tarefa de rotulagem e a inspeção dos dados sem trocar de aplicação;
+	\item \texttt{app/dashboard/app.py}: \textit{launcher} multi-página Streamlit, invocado via \texttt{streamlit run app/dashboard/app.py} (acessível em \texttt{http://localhost:8501}). Agrega em uma única interface 6 páginas:
 	
-	\item \texttt{app/dashboard/pages/annotation.py}: página principal de anotação, que implementa a interface de classificação tweet a tweet e obtém os dados diretamente do banco de dados via
-	\texttt{app/shared/db/database.py}.
+	\begin{itemize}
+		\item \textit{Anotação} (\texttt{pages/annotation.py});
+		\item \textit{Eploração de Dados} (\texttt{pages/exploration.py});
+		\item \textit{Split do Dadaset} (\texttt{pages/dataset\_split.py});
+		\item \textit{Fine-tuning BERTimbau} (\texttt{pages/fine\_tuning.py});
+		\item \textit{Classificação} (\texttt{pages/classification.py}) e;
+		\item \textit{Avaliação} (\texttt{pages/evaluation.py}.
+	\end{itemize}
+
 \end{itemize}
 
 A interface de classificação é composta por três componentes principais:
@@ -71,7 +78,7 @@ Cada decisão de classificação é persistida em duas estruturas complementares
 
 O corpus rotulado manualmente cumpre, neste trabalho, dois propósitos metodológicos distintos: (i) constitui o conjunto de referência (\textit{gold standard}) utilizado na avaliação comparativa das abordagens de classificação descritas na \autoref{sec:abordagens}; e (ii) é a fonte de exemplos supervisionados para o \textit{fine-tuning} de modelos pré-treinados ajustados localmente, como o BERTimbau (\autoref{subsec:bertimbau}). Esse duplo uso impõe uma decisão de protocolo: para que a comparação entre abordagens que viram os rótulos durante o treinamento (e.g., BERTimbau ajustado) e abordagens que não os viram (e.g., FinBERT-PT-BR e métodos léxicos) seja metodologicamente honesta, todas as abordagens devem ser avaliadas sobre o \textbf{mesmo subconjunto de teste}, definido a priori, antes de qualquer treinamento \cite{jurafsky2026,caseli2024cap1}.
 
-O particionamento é gerenciado pela classe \texttt{DatasetSplitRepository} (\texttt{app/shared/db/dataset\_split.py}), que implementa o método \texttt{assign\_split()} e persiste o resultado na tabela \texttt{dataset\_split}. A operação é idempotente: uma vez realizada, é reutilizada por todas as execuções subsequentes do \textit{pipeline}; o parâmetro \texttt{force=True} permite regenerá-la caso o corpus rotulado seja ampliado. A \autoref{tab:dataset_split} descreve o esquema da tabela.
+O particionamento é gerenciado pela classe \texttt{DatasetSplitRepository} (\texttt{app/shared /db/dataset\_split.py}), que implementa o método \texttt{assign\_split()} e persiste o resultado na tabela \texttt{dataset\_split}. A operação é idempotente: uma vez realizada, é reutilizada por todas as execuções subsequentes do \textit{pipeline}; o parâmetro \texttt{force=True} permite regenerá-la caso o corpus rotulado seja ampliado. A \autoref{tab:dataset_split} descreve o esquema da tabela.
 
 \begin{table}[!htbp]
 	\caption{Esquema da tabela \texttt{dataset\_split}}
@@ -82,7 +89,9 @@ O particionamento é gerenciado pela classe \texttt{DatasetSplitRepository} (\te
 		\textbf{Coluna} & \textbf{Tipo} & \textbf{Descrição} \\
 		\hline
 		\texttt{tweet\_id} & INTEGER & Chave estrangeira para \texttt{tweets.id}; único na tabela \\
+		\hline
 		\texttt{split}     & VARCHAR & \texttt{'train'} ou \texttt{'test'} \\
+		\hline
 		\texttt{fold}      & SMALLINT & Fold do K-Fold ($1$--$4$) quando \texttt{split='train'}; \texttt{NULL} quando \texttt{split='test'} \\
 		\hline
 	\end{tabular}
@@ -94,7 +103,7 @@ O procedimento compreende duas etapas sequenciais, ambas com estratificação pe
 \begin{enumerate}
 	\item \textbf{Hold-out de teste} ($\approx$~15\%): por meio de \texttt{train\_test\_split} com estratificação pelo sentimento, extrai-se um subconjunto fixo reservado exclusivamente para a avaliação comparativa final. Os registros recebem \texttt{split=`test'} e \texttt{fold=NULL}. Nenhum classificador — incluindo o BERTimbau — tem acesso a esses registros durante o treinamento, garantindo que as estimativas de desempenho reportadas no \autoref{Cap:Ava_Exp} sejam livres de viés de seleção;
 	
-	\item \textbf{Conjunto de treinamento} ($\approx$~85\%): os registros restantes recebem \texttt{split=`train'} e são subdivididos em $K=4$ folds por validação cruzada estratificada (\texttt{StratifiedKFold}, \texttt{shuffle=True}, \texttt{random\_state=42}), cada um marcado com \texttt{fold}~$\in \{1, 2, 3, 4\}$. Esse conjunto é utilizado exclusivamente pelo protocolo de \textit{fine-tuning} do BERTimbau, detalhado na \autoref{subsubsec:arquitetura_bertimbau}; os demais classificadores (OpLexicon, SentiLex-PT e FinBERT-PT-BR) não requerem dados de treinamento e, portanto, não dependem dessa subdivisão.
+	\item \textbf{Conjunto de treinamento} ($\approx$~85\%): os registros restantes recebem \texttt{split=`train'} e são subdivididos em $K=4$ folds por validação cruzada estratificada (\texttt{StratifiedK Fold}, \texttt{shuffle=True}, \texttt{random\_state=42}), cada um marcado com \texttt{fold}~$\in \{1, 2, 3, 4\}$. Esse conjunto é utilizado exclusivamente pelo protocolo de \textit{fine-tuning} do BERTimbau, detalhado na \autoref{subsubsec:arquitetura_bertimbau}; os demais classificadores (OpLexicon, SentiLex-PT e FinBERT-PT-BR) não requerem dados de treinamento e, portanto, não dependem dessa subdivisão.
 \end{enumerate}
 
 A \autoref{fig:dataset_split} ilustra a estrutura resultante do particionamento.

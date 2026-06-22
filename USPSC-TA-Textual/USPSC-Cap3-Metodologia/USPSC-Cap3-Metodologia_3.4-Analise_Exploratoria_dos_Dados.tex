@@ -21,23 +21,24 @@ Ambos os módulos obtêm os dados diretamente do banco de dados PostgreSQL via \
 \subsection{Dimensões do Corpus e Distribuição por Veículo}
 \label{subsec:dimensoes}
 
-O corpus final, exportado após o encerramento da coleta, é composto por \textbf{3.563 publicações}, distribuídas entre dois veículos monitorados conforme o \autoref{qua:dist_veiculo}. O InfoMoney responde pela ampla maioria das publicações (88,5\% do total), enquanto o InvestingBrasil contribui com os 11,5\% restantes. Essa assimetria reflete diferenças estruturais no ritmo de publicação das contas institucionais e deve ser considerada na etapa de construção do índice de sentimento agregado.
+O corpus final, exportado após o encerramento da coleta, é composto por \textbf{3.563 publicações}, distribuídas entre dois veículos monitorados conforme o \autoref{tab:dist_veiculo}. O InfoMoney responde pela ampla maioria das publicações (88,5\% do total), enquanto o InvestingBrasil contribui com os 11,5\% restantes. Essa assimetria reflete diferenças estruturais no ritmo de publicação das contas institucionais e deve ser considerada na etapa de construção do índice de sentimento agregado.
 
-\begin{quadro}[!htb]
+\begin{table}[!htbp]
 	\centering
-	\caption{\label{qua:dist_veiculo}Distribuição do corpus por veículo monitorado}
-	\begin{tabular}{|l|r|r|}
+	\caption{Distribuição do corpus por veículo monitorado}
+	\label{tab:dist_veiculo}
+	\begin{tabular}{lrr}
 		\hline
 		\textbf{Veículo} & \textbf{Publicações} & \textbf{Participação (\%)} \\
 		\hline
 		InfoMoney        & 3.154 & 88,5 \\
+		\hline
 		InvestingBrasil  &   409 & 11,5 \\
 		\hline
 		\textbf{Total}   & \textbf{3.563} & \textbf{100,0} \\
-		\hline
 	\end{tabular}
 	\legend{Fonte: Elaborado pelo autor com base nos dados coletados.}
-\end{quadro}
+\end{table}
 
 \begin{figure}[!htb]
 	\caption{\label{fig:dist_corpus}Distribuição do corpus por veículo (esquerda) e distribuição temporal mensal (direita)}
@@ -54,51 +55,61 @@ O corpus final, exportado após o encerramento da coleta, é composto por \textb
 	\end{minipage}
 \end{figure}
 
-A distribuição temporal das publicações ao longo do período analisado é apresentada no \autoref{qua:dist_mensal} e ilustrada na \autoref{fig:dist_corpus}. Observa-se que o InfoMoney não apresenta registros para outubro de 2025 — primeiro mês da janela de coleta —, ao passo que o InvestingBrasil possui 36 publicações nesse período. A ausência do InfoMoney em outubro deve ser investigada para determinar se decorreu de limitação da janela de coleta da API, de interrupção editorial do veículo ou de outra causa operacional. Os meses de dezembro de 2025 e janeiro de 2026 concentram o maior volume de publicações para ambos os veículos, e fevereiro de 2026 apresenta volume reduzido por corresponder a um período parcialmente coletado (até o dia~12).
+A distribuição temporal das publicações ao longo do período analisado é apresentada no \autoref{tab:dist_mensal} e ilustrada na \autoref{fig:dist_corpus}. Observa-se que o InfoMoney não apresenta registros para outubro de 2025 — primeiro mês da janela de coleta —, ao passo que o InvestingBrasil possui 36 publicações nesse período. A ausência do InfoMoney em outubro deve ser investigada para determinar se decorreu de limitação da janela de coleta da API, de interrupção editorial do veículo ou de outra causa operacional. Os meses de dezembro de 2025 e janeiro de 2026 concentram o maior volume de publicações para ambos os veículos, e fevereiro de 2026 apresenta volume reduzido por corresponder a um período parcialmente coletado (até o dia~12).
 
-\begin{quadro}[!htb]
+\begin{table}[!htbp]
 	\centering
-	\caption{\label{qua:dist_mensal}Distribuição mensal das publicações por veículo}
-	\begin{tabular}{|l|r|r|r|}
+	\caption{Distribuição mensal das publicações por veículo}
+	\label{tab:dist_mensal}
+	\begin{tabular}{lrrr}
 		\hline
 		\textbf{Mês}     & \textbf{InfoMoney} & \textbf{InvestingBrasil} & \textbf{Total} \\
 		\hline
 		Out/2025  &    0 &  36 &    36 \\
+		\hline
 		Nov/2025  &  723 &  94 &   817 \\
+		\hline
 		Dez/2025  &  997 & 119 & 1.116 \\
+		\hline
 		Jan/2026  & 1044 &  88 & 1.132 \\
+		\hline
 		Fev/2026  &  390 &  72 &   462 \\
 		\hline
 		\textbf{Total} & \textbf{3.154} & \textbf{409} & \textbf{3.563} \\
-		\hline
 	\end{tabular}
 	\legend{Fonte: Elaborado pelo autor com base nos dados coletados.}
-\end{quadro}
+\end{table}
 
  
 \subsection{Completude dos Campos}
 \label{subsec:completude}
 
-A verificação de valores ausentes foi realizada sobre os campos diretamente coletados via API do X/Twitter. O \autoref{qua:missing} sumariza a completude dos campos analisados, e a \autoref{fig:completude} apresenta a distribuição percentual de valores ausentes de forma visual.
+A verificação de valores ausentes foi realizada sobre os campos diretamente coletados via API do X/Twitter. O \autoref{tab:missing} sumariza a completude dos campos analisados, e a \autoref{fig:completude} apresenta a distribuição percentual de valores ausentes de forma visual.
 
-\begin{quadro}[!htb]
+\begin{table}[!htbp]
 	\centering
-	\caption{\label{qua:missing}Completude dos campos coletados via API}
-	\begin{tabular}{|l|r|r|l|}
+	\caption{Completude dos campos coletados via API}
+	\label{tab:missing}
+	\begin{tabular}{lrrl}
 		\hline
 		\textbf{Campo} & \textbf{Ausentes} & \textbf{\% Ausente} &
 		\textbf{Observação} \\
 		\hline
 		\texttt{tweet\_id}   &   0 & 0,0 & Completo \\
+		\hline
 		\texttt{username}    &   0 & 0,0 & Completo \\
+		\hline
 		\texttt{note\_tweet} &   0 & 0,0 & Completo \\
+		\hline
 		\texttt{created\_at} &   0 & 0,0 & Completo \\
+		\hline
 		\texttt{likes}       &   0 & 0,0 & Completo \\
+		\hline
 		\texttt{hashtags}    & 163 & 4,6 & Publicações sem \textit{hashtag} \\
 		\hline
 	\end{tabular}
 	\legend{Fonte: Elaborado pelo autor com base nos dados coletados.}
-\end{quadro}
+\end{table}
 
 \begin{figure}[!htb]
 	\centering
@@ -114,27 +125,35 @@ O corpus apresenta completude integral em cinco dos seis campos analisados. A ú
 \subsection{Distribuição do Comprimento dos Textos}
 \label{subsec:comprimento}
 
-Uma característica estrutural relevante do corpus, evidenciada pela AED, é o comprimento inusualmente elevado dos textos em relação ao formato convencional de publicações do X/Twitter. A mediana de \textbf{778	caracteres} e de \textbf{121 tokens} por publicação — valores muito superiores ao limite padrão de 280 caracteres da plataforma — confirma que a quase totalidade das publicações foi veiculada por meio do campo \texttt{note\_tweet} (texto estendido), disponível para usuários com assinatura X Premium. O \autoref{qua:stats_texto} apresenta as estatísticas descritivas completas.
+Uma característica estrutural relevante do corpus, evidenciada pela AED, é o comprimento inusualmente elevado dos textos em relação ao formato convencional de publicações do X/Twitter. A mediana de \textbf{778	caracteres} e de \textbf{121 tokens} por publicação — valores muito superiores ao limite padrão de 280 caracteres da plataforma — confirma que a quase totalidade das publicações foi veiculada por meio do campo \texttt{note\_tweet} (texto estendido), disponível para usuários com assinatura X Premium. O \autoref{tab:stats_texto} apresenta as estatísticas descritivas completas.
 
-\begin{quadro}[!htb]
+\begin{table}[!htbp]
 	\centering
-	\caption{\label{qua:stats_texto}Estatísticas descritivas do comprimento das publicações do corpus}
-	\begin{tabular}{|l|r|r|}
+	\caption{Estatísticas descritivas do comprimento das publicações do corpus}
+	\label{tab:stats_texto}
+	\begin{tabular}{lrr}
 		\hline
 		\textbf{Estatística} & \textbf{Caracteres} & \textbf{Tokens} \\
 		\hline
 		Contagem      & 3.563 & 3.563 \\
+		\hline
 		Média         &   783 &   123 \\
+		\hline
 		Desvio padrão &   254 &    40 \\
+		\hline
 		Mínimo        &   282 &    38 \\
+		\hline
 		1º quartil    &   596 &    94 \\
+		\hline
 		Mediana       &   778 &   121 \\
+		\hline
 		3º quartil    &   950 &   148 \\
+		\hline
 		Máximo        & 2.503 &   381 \\
 		\hline
 	\end{tabular}
 	\legend{Fonte: Elaborado pelo autor com base nos dados coletados.}
-\end{quadro}
+\end{table}
 
 Notavelmente, \textbf{nenhuma publicação} apresenta comprimento inferior a 50 caracteres ou a 5 tokens — limiares usualmente adotados para identificar textos curtos demais para classificação de sentimento. Esse resultado é diretamente explicado pela natureza da fonte: as publicações dos veículos monitorados consistem em resumos e chamadas de notícias que, mesmo no formato de \textit{tweet}, apresentam densidade textual elevada. As distribuições por número de caracteres e por número de tokens são apresentadas na \autoref{fig:histogramas_comprimento}.
 

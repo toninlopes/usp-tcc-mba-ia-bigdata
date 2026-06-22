@@ -1,20 +1,18 @@
 %% USPSC-Abstract.tex
-%\autor{Silva, M. J.}
 \begin{resumo}[Abstract]
- \begin{otherlanguage*}{english}
-	\begin{flushleft} 
-		\setlength{\absparsep}{0pt} % ajusta o espaçamento dos parágrafos do resumo		
- 		\SingleSpacing  		\imprimirautorabr~~\textbf{\imprimirtitleabstract}.	\imprimirdata.  \pageref{LastPage} p. 
-		%Substitua p. por f. quando utilizar oneside em \documentclass
-		%\pageref{LastPage} f.
-		\imprimirtipotrabalhoabs~-~\imprimirinstituicao, \imprimirlocal, 	\imprimirdata. 
- 	\end{flushleft}
-	\OnehalfSpacing 
-   This is the english abstract.
-
-   \vspace{\onelineskip}
- 
-   \noindent 
-   \textbf{Keywords}: LaTeX. USPSC class. Thesis. Dissertation. Conclusion course paper. Report. 
- \end{otherlanguage*}
+	\begin{otherlanguage*}{english}
+		\begin{flushleft} 
+			\setlength{\absparsep}{0pt} % ajusta o espaçamento dos parágrafos do resumo		
+			\SingleSpacing  		\imprimirautorabr~~\textbf{\imprimirtitleabstract}.	\imprimirdata.  \pageref{LastPage} p. 
+			%Substitua p. por f. quando utilizar oneside em \documentclass
+			%\pageref{LastPage} f.
+			\imprimirtipotrabalhoabs~-~\imprimirinstituicao, \imprimirlocal, 	\imprimirdata. 
+		\end{flushleft}
+		\OnehalfSpacing 
+		
+		The exponential growth of publications on social media platforms has produced massive volumes of unstructured textual data with relevant informational potential for monitoring sentiment in financial markets. In the Brazilian context, the literature on sentiment analysis applied to the financial domain in Portuguese remains incipient, with a scarcity of labeled datasets, absence of reproducible pipelines, and a lack of systematic comparisons between distinct methodological approaches --- a gap that hinders the direct transfer of solutions developed for other languages and markets, and motivates the development of resources and protocols specific to Portuguese. This work proposes, implements, and documents an end-to-end Natural Language Processing (NLP) pipeline for sentiment analysis of financial publications in Portuguese on X/Twitter, focusing on the Brazilian financial market, offering the academic community a replicable methodological protocol amenable to extension in future research. The corpus was built from publications of the outlets InfoMoney and InvestingBrasil between October 2025 and February 2026, collected via the X/Twitter API v2, stored in a PostgreSQL database, and manually labeled by the researcher with explicit criteria for financial relevance and sentiment polarity (positive, neutral, negative). The pipeline integrates stages of structured collection, exploratory data analysis, approach-specific textual preprocessing, sentiment classification, and comparative evaluation on a fixed test set. Four approaches were evaluated on a test set of 373 class-stratified instances: two lexicon-based --- OpLexicon~v3.0 and SentiLex-PT --- and two based on pre-trained language models --- FinBERT-PT-BR, a BERT model specialized in the financial domain in Portuguese, and BERTimbau (\texttt{neuralmind/bert-base-portuguese-cased}) fine-tuned directly on the local corpus. The results establish a clear performance hierarchy: OpLexicon~v3.0 (accuracy 23.86\%; macro F1-score 22.53\%) $<$ SentiLex-PT (accuracy 28.95\%; macro F1-score 28.88\%) $<$ FinBERT-PT-BR (accuracy 40.48\%; macro F1-score 40.44\%) $\ll$ fine-tuned BERTimbau (accuracy 89.28\%; macro F1-score 82.78\%). The central finding is that fine-tuning BERTimbau directly on the financial tweet corpus produced absolute gains of 48.8 percentage points in accuracy and 42.3 points in macro F1-score over FinBERT-PT-BR, confirming that local adaptation to genre and subdomain outperforms, in this context, prior domain specialization. Lexicon-based approaches did not surpass a majority-class baseline classifier (accuracy of 71.3\% by classifying all instances as neutral), evidencing the inadequacy of general-purpose lexical resources for financial journalistic publications of predominantly factual character. Contributions span three dimensions: scientific, with empirical evidence on the performance hierarchy of approaches on a Portuguese financial tweet corpus; methodological, with the proposal of a reproducible end-to-end protocol available in a public repository; and practical, with the development of an automated sentiment monitoring tool applicable to tracking financial discourse in specialized outlets of the Brazilian market.
+		
+		
+		\textbf{Keywords}: Sentiment analysis. Natural Language Processing. Brazilian financial market. BERTimbau. Fine-tuning. FinBERT-PT-BR. X/Twitter.
+	\end{otherlanguage*}
 \end{resumo}

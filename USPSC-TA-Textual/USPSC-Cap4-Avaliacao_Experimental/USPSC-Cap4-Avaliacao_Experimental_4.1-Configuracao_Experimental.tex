@@ -20,7 +20,9 @@ A avaliação comparativa foi realizada sobre um conjunto de teste composto por 
 		\textbf{Classe} & \textbf{Instâncias} & \textbf{Proporção} \\
 		\hline
 		Positivo  & 59  & 15,8\% \\
+		\hline
 		Neutro    & 266 & 71,3\% \\
+		\hline
 		Negativo  & 48  & 12,9\% \\
 		\hline
 		\textbf{Total} & \textbf{373} & \textbf{100,0\%} \\
@@ -41,32 +43,41 @@ As abordagens léxicas (OpLexicon e SentiLex-PT) e o FinBERT-PT-BR operam de for
 \subsection{Configuração do Fine-Tuning do BERTimbau}
 \label{subsec:config_finetuning}
 
-O processo de \textit{fine-tuning} do BERTimbau, descrito em detalhes na \autoref{subsubsec:finetuning_bertimbau}, foi executado com os hiperparâmetros consolidados no \autoref{qua:hiperparametros_bertimbau}.
+O processo de \textit{fine-tuning} do BERTimbau, descrito em detalhes na \autoref{subsubsec:arquitetura_bertimbau}, foi executado com os hiperparâmetros consolidados no \autoref{tab:hiperparametros_bertimbau}.
 
-
-\begin{quadro}[!htbp]
+\begin{table}[!htbp]
 	\caption[Hiperparâmetros do fine-tuning do BERTimbau]{Hiperparâmetros utilizados no \textit{fine-tuning} do BERTimbau}
-	\label{qua:hiperparametros_bertimbau}
+	\label{tab:hiperparametros_bertimbau}
 	\centering
-	\begin{tabular}{ll}
+	\begin{tabular}{lp{9cm}}
 		\hline
 		\textbf{Hiperparâmetro} & \textbf{Valor} \\
 		\hline
 		Modelo base                          & \texttt{neuralmind/bert-base-portuguese-cased} \\
+		\hline
 		Taxa de aprendizado                  & $5 \times 10^{-5}$ \\
-		Tamanho do batch                     & 8 \\
+		\hline
+		Tamanho do batch                     & 8 \\ 
+		\hline
 		Número máximo de épocas              & 12 \\
+		\hline
 		Comprimento máximo (\textit{tokens}) & 512 \\
+		\hline
 		\textit{Warmup ratio}                & 0,10 \\
+		\hline
 		\textit{Weight decay}                & 0,01 \\
+		\hline
 		\textit{Early stopping}              & Paciência de 2 épocas (F1 macro na dobra de validação) \\
+		\hline
 		Validação cruzada                    & 4 dobras estratificadas (\textit{best fold}: 1, F1 macro val. = 90,00\%) \\
+		\hline
 		Função de perda                      & \texttt{CrossEntropyLoss} com pesos de classe balanceados \\
+		\hline
 		Semente aleatória                    & 42 \\
 		\hline
 	\end{tabular}
 	\legend{Fonte: Elaborada pelo autor.}
-\end{quadro}
+\end{table}
 
 
 O desbalanceamento de classes foi mitigado por meio de uma subclasse personalizada do \texttt{Trainer} da biblioteca \textit{HuggingFace Transformers} \cite{wolf2020transformers} (\texttt{WeightedTrainer}), que recalcula a função de perda com pesos inversamente proporcionais à frequência de cada classe, calculados via \texttt{compute\_class\_weight('balanced')} do scikit-learn. O treinamento foi executado sobre a partição de 70\% do corpus rotulado, com monitoramento sobre a partição de validação (15\%) para ativação do \textit{early stopping}.
@@ -74,25 +85,30 @@ O desbalanceamento de classes foi mitigado por meio de uma subclasse personaliza
 \subsection{Ambiente Computacional}
 \label{subsec:ambiente}
 
-O \textit{pipeline} de avaliação foi executado em ambiente Python 3.11, com as principais dependências listadas no \autoref{qua:dependencias}.
+O \textit{pipeline} de avaliação foi executado em ambiente Python 3.11, com as principais dependências listadas no \autoref{tab:dependencias}.
 
-\begin{quadro}[!htbp]
+\begin{table}[!htbp]
 	\caption[Principais dependências do ambiente de execução]{Principais dependências do ambiente de execução}
-	\label{qua:dependencias}
+	\label{tab:dependencias}
 	\centering
 	\begin{tabular}{ll}
 		\hline
 		\textbf{Biblioteca} & \textbf{Finalidade} \\
 		\hline
 		\texttt{transformers} (HuggingFace) & Carregamento e inferência dos modelos BERT \\
+		\hline
 		\texttt{scikit-learn}               & Métricas de avaliação e pesos de classe \\
+		\hline
 		\texttt{torch} (PyTorch)            & Backend de treinamento e inferência neural \\
+		\hline
 		\texttt{pandas} / \texttt{numpy}    & Manipulação de dados e matrizes \\
+		\hline
 		\texttt{psycopg2}                   & Acesso ao banco de dados PostgreSQL \\
+		\hline
 		\texttt{loguru}                     & Registro de eventos do \textit{pipeline} \\
 		\hline
 	\end{tabular}
 	\legend{Fonte: Elaborada pelo autor.}
-\end{quadro}
+\end{table}
 
-O banco de dados PostgreSQL foi provisionado em contêiner Docker, e os artefatos do \textit{fine-tuning} do BERTimbau --- incluindo a matriz de confusão e o relatório de classificação do conjunto de teste --- foram persistidos no diretório \texttt{models/bert-timbau-sentiment/eval/} do repositório do \textit{pipeline}.
+O banco de dados PostgreSQL foi provisionado em contêiner Docker, e os artefatos do \textit{fine-tuning} do BERTimbau --- incluindo a matriz de confusão e o relatório de classificação do conjunto de teste --- foram persistidos no diretório \texttt{models/bert-timbau-sentiment/ eval/} do repositório do \textit{pipeline}.
