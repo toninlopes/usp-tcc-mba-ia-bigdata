@@ -69,12 +69,13 @@ O \textit{pipeline} é estruturado em seis etapas sequenciais, conforme ilustrad
 \subsection{Ambiente de Execução e Ferramentas}
 \label{subsec:ambiente_execucao}
 
-A implementação foi realizada na linguagem \textbf{Python 3.11}, escolhida por sua ampla adoção na comunidade de PLN e aprendizado de máquina e pela disponibilidade de ecossistema maduro de bibliotecas especializadas. O \autoref{qua:bibliotecas} lista as principais dependências utilizadas e suas respectivas funções no \textit{pipeline}.
+A implementação foi realizada na linguagem \textbf{Python 3.11}, escolhida por sua ampla adoção na comunidade de PLN e aprendizado de máquina e pela disponibilidade de ecossistema maduro de bibliotecas especializadas. O \autoref{tab:bibliotecas} lista as principais dependências utilizadas e suas respectivas funções no \textit{pipeline}.
 
-\begin{quadro}[!htb]
+\begin{table}[!htb]
+	\caption[Principais bibliotecas Python utilizadas no \textit{pipeline} e respectivas funções]{Principais bibliotecas Python utilizadas no \textit{pipeline} e respectivas funções}
+	\label{tab:bibliotecas}
 	\centering
-	\caption{\label{qua:bibliotecas}Principais bibliotecas Python utilizadas no \textit{pipeline} e respectivas funções}
-	\begin{tabular}{|c|c|p{8cm}|}
+	\begin{tabular}{ccp{10cm}}
 		\hline
 		\textbf{Biblioteca} & \textbf{Versão} & \textbf{Função no \textit{Pipeline}} \\
 		
@@ -119,6 +120,6 @@ A implementação foi realizada na linguagem \textbf{Python 3.11}, escolhida por
 		\hline
 	\end{tabular}
 	\legend{Fonte: Elaborado pelo autor.}
-\end{quadro}
+\end{table}
 
 O código-fonte do \textit{pipeline} está organizado como um pacote Python versionado, com dependências declaradas em arquivo \texttt{requirements.txt}, de modo a facilitar a reprodução dos experimentos em ambientes distintos.

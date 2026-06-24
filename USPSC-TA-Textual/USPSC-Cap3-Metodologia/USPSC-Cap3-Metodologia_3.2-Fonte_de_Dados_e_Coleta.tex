@@ -55,88 +55,79 @@ A autenticação foi realizada via \textbf{Bearer Token} (\textit{app-only authe
 \subsubsection{Parâmetros da Requisição}
 \label{subsubsec:parametros_api}
 
-Para cada veículo monitorado, as requisições foram parametrizadas conforme o \autoref{qua:params_api}. O intervalo temporal foi delimitado pelos campos \texttt{start\_time} e \texttt{end\_time}, ambos no formato ISO~8601 (\texttt{YYYY-MM-DDTHH:mm:ssZ}, UTC). O volume máximo de resultados por página foi fixado em 100 registros — limite superior permitido pelo \textit{endpoint} —, e a paginação foi controlada pelo parâmetro \texttt{pagination\_token}, utilizado de forma iterativa até o esgotamento dos resultados disponíveis.
+Para cada veículo monitorado, as requisições foram parametrizadas conforme o \autoref{tab:params_api}. O intervalo temporal foi delimitado pelos campos \texttt{start\_time} e \texttt{end\_time}, ambos no formato ISO~8601 (\texttt{YYYY-MM-DDTHH:mm:ssZ}, UTC). O volume máximo de resultados por página foi fixado em 100 registros — limite superior permitido pelo \textit{endpoint} —, e a paginação foi controlada pelo parâmetro \texttt{pagination\_token}, utilizado de forma iterativa até o esgotamento dos resultados disponíveis.
 
-\begin{quadro}[htb]
-	\caption{\label{qua:params_api}Parâmetros utilizados nas requisições ao \textit{endpoint} \texttt{GET /2/users/\{id\}/tweets}}
+\begin{table}[htb]
+	\caption{Parâmetros utilizados nas requisições ao \textit{endpoint} \\ \texttt{GET /2/users/ \{id\}/tweets}}
+	\label{tab:params_api}
 	
-	\begin{tabular}{|p{4.5cm}|p{10.5cm}|}
+	\begin{tabular}{p{4cm}p{10.5cm}}
 		\hline
 		\textbf{Parâmetro} & \textbf{Valor / Descrição} \\
 		\hline
-		
 		\texttt{id} (path) & Identificador numérico do veículo: \texttt{@InfoMoney} e \texttt{@InvestingBrasil}, passados dinamicamente a cada ciclo de coleta \\
 		\hline
-		
 		\texttt{start\_time} & Limite inferior do intervalo temporal (ISO 8601, UTC) \\
 		\hline
-		
 		\texttt{end\_time} & Limite superior do intervalo temporal (ISO 8601, UTC) \\
 		\hline
-		
 		\texttt{max\_results} & \texttt{100} (máximo permitido pelo \textit{endpoint}) \\
 		\hline
-		
 		\texttt{tweet.fields} & \texttt{created\_at}, \texttt{note\_tweet}, \texttt{author\_id}, \texttt{public\_metrics}, \texttt{lang}, \texttt{source}, \texttt{entities}, \texttt{context\_annotations}, \texttt{geo} \\
 		\hline
-		
 		\texttt{user.fields} & \texttt{name}, \texttt{username}, \texttt{location}, \texttt{description}, \texttt{public\_metrics} \\
 		\hline
-		
 		\texttt{pagination\_token} & Token retornado pela API para recuperação da próxima página de resultados; omitido na primeira requisição de cada ciclo \\
 		\hline
 	\end{tabular}
 	\legend{Fonte: Elaborado pelo autor com base na documentação da API v2 do X/Twitter e no código-fonte do \textit{pipeline} de coleta.}
-\end{quadro}
+\end{table}
 
 Um aspecto técnico relevante diz respeito ao campo \texttt{note\_tweet}: publicações de usuários com assinatura X Premium podem ultrapassar o limite convencional de 280 caracteres por meio desse campo, que armazena o texto estendido separadamente do campo \texttt{text} padrão. O \textit{pipeline} implementado prioriza o conteúdo de \texttt{note\_tweet} quando disponível, recorrendo ao \texttt{text} convencional apenas na sua ausência — decisão que garante a recuperação do conteúdo textual integral das publicações. Registros sem conteúdo textual em nenhum dos dois campos são descartados durante a coleta.
 
 \subsubsection{\textit{Pipeline} de Coleta e Armazenamento}
 \label{subsubsec:pipeline_coleta}
 
-O \textit{pipeline} de coleta é a primeira etapa (\texttt{pipeline/01\_extraction/}) de uma estrutura modular de seis estágios numerados. Os módulos que compõem essa etapa, com suas
-responsabilidades bem delimitadas, são:
+O \textit{pipeline} de coleta é a primeira etapa de uma estrutura modular de seis estágios. Os módulos que compõem essa etapa, com suas responsabilidades bem delimitadas, são:
 
 \begin{itemize}
-	\item \texttt{app/core/extraction/twitter\_api.py}: implementa a classe \texttt{TwitterAPIExtractor}, que herda da classe abstrata \texttt{BaseExtractor} e é responsável pela construção e execução
-	das requisições HTTP à API via biblioteca \texttt{requests}. Recebe como parâmetros o identificador do usuário (\texttt{x\_user\_id}), o intervalo temporal e, opcionalmente, o token de paginação;
+	\item \texttt{app/core/extraction/twitter\_api.py}: a classe \texttt{TwitterAPIExtractor} herda da classe abstrata \texttt{BaseExtractor} e é responsável pela construção e execução das requisições HTTP à API via biblioteca \texttt{requests}. Recebe como parâmetros o identificador do usuário (\texttt{x\_user\_id}), o intervalo temporal e, opcionalmente, o token de paginação;
 	
-	\item \texttt{app/core/extraction/base\_extractor.py}: define a classe abstrata \texttt{BaseExtractor} (ABC), que estabelece o contrato de interface para qualquer extrator de dados do 	\textit{pipeline}, garantindo extensibilidade para futuras fontes de dados além do X/Twitter;
+	\item \texttt{app/core/extraction/base\_extractor.py}: define a classe abstrata \texttt{BaseExtractor} (ABC), que estabelece o contrato de interface para qualquer extrator de dados do \textit{pipeline}, garantindo extensibilidade para futuras fontes de dados além do X/Twitter;
 	
 	\item \texttt{app/shared/schemas.py}: módulo transversal a todas as etapas do \textit{pipeline}, contendo as \textit{dataclasses} de \textit{parsing} da resposta JSON da API — \texttt{Tweet}, \texttt{Tweets}, \texttt{NoteTweet}, \texttt{PublicMetrics}, \texttt{Entities}, \texttt{Hashtag} e \texttt{Meta} —, que estruturam os campos retornados em objetos Python tipados;
 	
 	\item \texttt{app/core/extraction/collection\_log.py}: define a classe \texttt{SearchTerm}, que representa um registro de coleta agendada com os campos \texttt{x\_user\_id}, 	\texttt{from\_date\_time} e \texttt{to\_date\_time}, e gerencia a inserção dos termos de busca na tabela \texttt{collection\_log};
 	
-	\item \texttt{app/shared/db/database.py}: módulo transversal que implementa a classe \texttt{DatabaseManager}, responsável pela interface de comunicação com o banco de dados PostgreSQL — incluindo as operações de consulta, inserção e atualização utilizadas por todos os estágios do \textit{pipeline};
+	\item \texttt{app/shared/db/database.py}: módulo transversal que implementa a classe \texttt{Database Manager}, responsável pela interface de comunicação com o banco de dados PostgreSQL — incluindo as operações de consulta, inserção e atualização utilizadas por todos os estágios do \textit{pipeline};
 	
 	\item \texttt{app/core/extraction/\_\_main\_\_.py}: ponto de entrada do estágio de coleta (invocado via \texttt{python -m app.core.extraction}, que orquestra o ciclo completo: recupera
 	registros com status \texttt{pending} em \texttt{collection\_log}, executa a paginação iterativa para cada um deles e persiste os resultados no banco de dados.
 \end{itemize}
 
-Os dados coletados foram persistidos em um banco de dados \textbf{PostgreSQL~15}, provisionado em contêiner \textbf{Docker} para garantir portabilidade e isolamento do ambiente. A infraestrutura é inicializada via \texttt{docker-compose.yml}, que sobe automaticamente o PostgreSQL (porta~5432) e o pgAdmin~4 (porta~5050), executando os scripts \texttt{infra/01-init-database.sh} — criação de usuário e permissões — e \texttt{infra/02-create-tables.sql} — criação das tabelas e índices. O esquema do banco é composto por três tabelas, cujas estruturas são descritas no \autoref{qua:schema_db}.
+Os dados coletados foram persistidos em um banco de dados \textbf{PostgreSQL~15}, provisionado em contêiner \textbf{Docker} para garantir portabilidade e isolamento do ambiente. A infraestrutura é inicializada via \texttt{docker-compose.yml}, que sobe automaticamente o PostgreSQL (porta~5432) e o pgAdmin~4 (porta~5050), executando os scripts \texttt{infra/01-init-database.sh} --- criação de usuário e permissões --- e \texttt{infra/02-create- tables.sql} --- criação das tabelas e índices. O esquema do banco é composto por três tabelas, cujas estruturas são descritas no \autoref{tab:schema_db}.
 
-\begin{quadro}[!htb]
-	\caption{\label{qua:schema_db}Estrutura das tabelas do banco de dados PostgreSQL}
+\begin{table}[!htb]
+	\caption{Estrutura das tabelas do banco de dados PostgreSQL}
+	\label{tab:schema_db}
 	
-	\begin{tabular}{|p{4.5cm}|p{4.5cm}|p{5.8cm}|}
+	\begin{tabular}{p{4.5cm}p{4.5cm}p{5.8cm}}
 		\hline
 		\textbf{Tabela} & \textbf{Campo} & \textbf{Descrição} \\
 		\hline
-		\multirow{8}{*}{\texttt{tweets}} & \texttt{tweet\_id} & Identificador único da publicação na plataforma (\texttt{UNIQUE}) \\ & \texttt{username} & Identificador numérico do veículo autor \\
+		\texttt{tweets} & \texttt{tweet\_id} & Identificador único da publicação na plataforma (\texttt{UNIQUE}) \\ & \texttt{username} & Identificador numérico do veículo autor \\
 		& \texttt{note\_tweet} & Conteúdo textual utilizado na análise (\texttt{note\_tweet.text} ou \texttt{text}) \\ & \texttt{created\_at} & Data e hora de publicação (com fuso horário) \\ & \texttt{likes}
 		& Número de curtidas \\ & \texttt{hashtags} & Lista de \textit{hashtags} (JSONB) \\ & \texttt{tweet} & Objeto JSON completo retornado pela API
 		(JSONB) \\
-		
 		\hline
-		\multirow{7}{*}{\texttt{tweets\_classification}} & \texttt{tweet\_id} & FK → \texttt{tweets.id} (\texttt{ON DELETE CASCADE}) \\ & \texttt{sentiment} & Polaridade atribuída: \textit{positivo}, \textit{negativo} ou \textit{neutro} \\ & \texttt{why\_sentiment} & Justificativa textual para a polaridade classificada \\ & \texttt{is\_finance\_news}   & Relevância financeira classificada: 1~=~financeiro, 0~=~não financeiro \\ & \texttt{why\_is\_finance\_news} & Justificativa textual para a classificação de relevância \\ & \texttt{classificator} & Identificador do classificador: \texttt{"Humano"}, \texttt{"FinBERT-PT-BR"}, \texttt{"BERTimbau"} ou outro modelo futuro \\
-		
+		\texttt{tweets\_classification} & \texttt{tweet\_id} & FK → \texttt{tweets.id} (\texttt{ON DELETE CASCADE}) \\ & \texttt{sentiment} & Polaridade atribuída: \textit{positivo}, \textit{negativo} ou \textit{neutro} \\ & \texttt{why\_sentiment} & Justificativa textual para a polaridade classificada \\ & \texttt{is\_finance\_news}   & Relevância financeira classificada: 1~=~financeiro, 0~=~não financeiro \\ & \texttt{why\_is\_finance\_news} & Justificativa textual para a classificação de relevância \\ & \texttt{classificator} & Identificador do classificador: \texttt{"Humano"}, \texttt{"FinBERT-PT-BR"}, \texttt{"BERTimbau"} ou outro modelo futuro \\
 		\hline
-		\multirow{6}{*}{\texttt{collection\_log}} & \texttt{search\_term} & Parâmetros da coleta agendada (JSONB) \\ & \texttt{tweets\_collected}    & Total de registros inseridos no 	ciclo \\
+		\texttt{collection\_log} & \texttt{search\_term} & Parâmetros da coleta agendada (JSONB) \\ & \texttt{tweets\_collected}    & Total de registros inseridos no 	ciclo \\
 		& \texttt{start\_time} & Início da execução do ciclo de coleta \\ & \texttt{end\_time} & Término da execução do ciclo de coleta \\ 	& \texttt{status} & Estado do ciclo: \texttt{pending}, 		\texttt{completed} ou \texttt{partially\_completed} \\ & \texttt{error\_message} & Mensagem de erro, se houver \\
 		\hline
 	\end{tabular}
 	\legend{Fonte: Elaborado pelo autor com base no schema \texttt{infra/02-create-tables.sql} do repositório do \textit{pipeline}.}
-\end{quadro}
+\end{table}
 
 A tabela \texttt{collection\_log} cumpre função de controle de idempotência: cada combinação de veículo e intervalo temporal é registrada com status \texttt{pending} antes da execução, sendo
 atualizada para \texttt{completed} ao final de um ciclo sem falhas de inserção, ou para \texttt{partially\_completed} caso algum registro não tenha sido persistido. Esse mecanismo permite a retomada segura de coletas interrompidas e a auditoria do histórico de execuções sem risco de duplicação de dados, uma vez que a coluna \texttt{tweet\_id} na tabela \texttt{tweets} é definida com restrição \texttt{UNIQUE}.

@@ -9,14 +9,10 @@
 			%\pageref{LastPage} f.
 			\imprimirtipotrabalho~-~\imprimirinstituicao, \imprimirlocal, \imprimirdata. 
  	\end{flushleft}
-\OnehalfSpacing 
+	
+	\OnehalfSpacing 
+	
+	A expansão das plataformas de mídias sociais produziu volumes massivos de dados textuais com potencial informacional relevante para o monitoramento do sentimento no mercado financeiro. No contexto brasileiro, a literatura sobre análise de sentimento em língua portuguesa aplicada ao domínio financeiro permanece incipiente, com escassez de bases rotuladas, ausência de pipelines reproduzíveis e carência de comparações sistemáticas entre abordagens metodológicas distintas. Este trabalho propõe, implementa e documenta um pipeline de Processamento de Linguagem Natural (PLN) de ponta a ponta para análise de sentimento de publicações financeiras em português no X/Twitter, oferecendo à comunidade acadêmica um protocolo metodológico replicável. O corpus foi construído a partir de publicações dos veículos InfoMoney e InvestingBrasil entre outubro de 2025 e fevereiro de 2026, coletadas via API v2 do X/Twitter, armazenadas em PostgreSQL e rotuladas manualmente com critérios explícitos de polaridade (positivo, neutro, negativo). Quatro abordagens foram avaliadas sobre um conjunto de teste fixo com 373 instâncias estratificadas: duas léxicas --- OpLexicon~v3.0 e SentiLex-PT --- e duas baseadas em modelos de linguagem pré-treinados --- FinBERT-PT-BR e BERTimbau (\texttt{neuralmind/bert-base-portuguese-cased}) ajustado por \textit{fine-tuning} sobre o corpus local. Os resultados estabelecem uma hierarquia clara: OpLexicon~v3.0 (acurácia 23,86\%; F1 macro 22,53\%) $<$ SentiLex-PT (acurácia 28,95\%; F1 macro 28,88\%) $<$ FinBERT-PT-BR (acurácia 40,48\%; F1 macro 40,44\%) $\ll$ BERTimbau ajustado (acurácia 89,28\%; F1 macro 82,78\%). O ajuste fino do BERTimbau sobre o corpus local produziu ganhos de 48,8 pontos percentuais em acurácia e 42,3 pontos em F1 macro sobre o FinBERT-PT-BR, confirmando que a adaptação ao gênero e ao subdomínio supera a especialização prévia de domínio. As abordagens léxicas não superaram um classificador por maioria de classe, evidenciando sua inadequação para publicações financeiras de caráter factual. As contribuições abrangem evidências empíricas sobre a hierarquia de abordagens, um protocolo reproduzível disponível em repositório público e uma ferramenta de monitoramento automatizado de sentimento aplicável ao discurso financeiro brasileiro.
 
-Apresentar, em resumo, a contextualização, motivação, lacunas, proposta, resultados, direções e conclusões. (1 parágrafo (+- 500 palavras)).
-
- O resumo deve ressaltar o  objetivo, o método, os resultados e as conclusões do documento. A ordem e a extensão  destes itens dependem do tipo de resumo (informativo ou indicativo) e do  tratamento que cada item recebe no documento original. O resumo deve ser
- precedido da referência do documento, com exceção do resumo inserido no
- próprio documento. (\ldots)  Salientamos que algumas Unidades exigem o titulo dos trabalhos acadêmicos em inglês, tornando necessário a inclusão das referências nos resumos e abstracts, o que foi adotado no \textbf{Modelo para TCC em \LaTeX\ utilizando a classe USPSC} e no \textbf{Modelo para teses e dissertações em \LaTeX\ utilizando a classe USPSC}. As palavras-chave devem figurar logo abaixo do  resumo, antecedidas da expressão Palavras-chave:, separadas entre si por  ponto e finalizadas também por ponto nbr6028.
- 
-
- \textbf{Palavras-chave}: LaTeX. Classe USPSC. Tese. Dissertação. Trabalho de conclusão de curso (TCC). Relatório.
+	\textbf{Palavras-chave}: Análise de sentimento. Processamento de Linguagem Natural. Mercado financeiro brasileiro. BERTimbau. \textit{Fine-tuning}. FinBERT-PT-BR. X/Twitter.
 \end{resumo}

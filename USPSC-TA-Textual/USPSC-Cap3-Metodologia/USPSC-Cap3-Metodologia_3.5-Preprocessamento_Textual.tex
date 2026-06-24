@@ -12,7 +12,7 @@ As decisões de pré-processamento adotadas neste trabalho foram calibradas em f
 
 As funções de limpeza residem em \textbf{\texttt{app/shared/text\_cleaner.py}}, módulo transversal compartilhado entre os estágios de pré-processamento e classificação, garantindo consistência e evitando duplicação de código.
 
-\subsection{Fluxo Completo — Abordagem Léxica}
+\subsection{Fluxo Completo --- Abordagem Léxica}
 \label{subsec:fluxo_lexico}
 
 \subsubsection{Substituição de URLs}
@@ -64,11 +64,12 @@ Palavras funcionais de alta frequência sem valor semântico para a tarefa de cl
 
 As palavras são reduzidas à sua forma canônica (lema) por meio do modelo de língua portuguesa \texttt{pt\_core\_news\_lg} da biblioteca \texttt{spaCy}\footnote{Disponível em: \url{https://spacy.io/}. Acesso em: 12 fev. 2026.}, preservando distinções lexicais relevantes ao domínio (e.g., ``alta'' como substantivo versus ``alto'' como adjetivo).
 
-O \autoref{qua:exemplo_clean} ilustra o resultado da aplicação sequencial das oito etapas a uma publicação de exemplo.
+O \autoref{tab:exemplo_clean} ilustra o resultado da aplicação sequencial das oito etapas a uma publicação de exemplo.
 
-\begin{quadro}[!htb]
-	\caption{\label{qua:exemplo_clean}Exemplo de aplicação da função \texttt{clean()} a uma publicação do corpus}
-	\begin{tabular}{|p{3cm}|p{12cm}|}
+\begin{table}[!htbp]
+	\caption{Exemplo de aplicação da função \texttt{clean()} a uma publicação do corpus}
+	\label{tab:exemplo_clean}
+	\begin{tabular}{p{3cm}p{12cm}}
 		\hline
 		\textbf{Etapa} & \textbf{Texto} \\
 		\hline
@@ -78,12 +79,12 @@ O \autoref{qua:exemplo_clean} ilustra o resultado da aplicação sequencial das 
 		\hline
 	\end{tabular}
 	\legend{Fonte: Elaborado pelo autor com base no código-fonte de \texttt{app/shared/text\_cleaner.py}.}
-\end{quadro}
+\end{table}
 
-\subsection{Fluxo Reduzido — FinBERT-PT-BR}
+\subsection{Fluxo Reduzido --- FinBERT-PT-BR}
 \label{subsec:fluxo_finbert}
 
-O FinBERT-PT-BR utiliza um fluxo de pré-processamento próprio, implementado no método \texttt{preprocess()} da classe \texttt{FinBertPTBRAnalyzer} (\texttt{app/core/processing/bert/finbert\_ptbr.py}), que importa seletivamente as funções de \texttt{app/shared/text\_cleaner.py} e aplica apenas seis das oito etapas descritas na \autoref{subsec:fluxo_lexico}. As diferenças em relação ao fluxo completo são:
+O FinBERT-PT-BR utiliza um fluxo de pré-processamento próprio, implementado no método \texttt{preprocess()} da classe \texttt{FinBertPTBRAnalyzer} (\texttt{app/core/processing/bert /finbert\_ptbr.py}), que importa seletivamente as funções de \texttt{app/shared/text\_cleaner .py} e aplica apenas seis das oito etapas descritas na \autoref{subsec:fluxo_lexico}. As diferenças em relação ao fluxo completo são:
 
 \begin{itemize}
 	\item \textbf{Emojis}: em vez de converter para \textit{name codes}, os emojis são \textbf{removidos} via \texttt{emoji.replace\_emoji()}. Essa decisão decorre do fato de que o vocabulário do FinBERT-PT-BR não foi treinado sobre \textit{name codes} de emojis, tornando sua presença potencialmente ruidosa para o modelo;
@@ -91,36 +92,37 @@ O FinBERT-PT-BR utiliza um fluxo de pré-processamento próprio, implementado no
 	\item \textbf{Remoção de \textit{stopwords} e lematização}: \textbf{não aplicadas}. Como o BERT opera sobre sequências completas de \textit{tokens} e captura dependências contextuais de longa distância por meio do mecanismo de atenção, a remoção de palavras funcionais ou a redução morfológica podem degradar a representação contextual do texto \cite{devlin2019,santos2023finbert}.
 \end{itemize}
 
-O \autoref{qua:comparativo_preproc} sintetiza as diferenças entre os dois fluxos de pré-processamento.
+O \autoref{tab:comparativo_preproc} sintetiza as diferenças entre os dois fluxos de pré-processamento.
 
-\begin{quadro}[!htb]
-	\caption{\label{qua:comparativo_preproc}Comparativo entre os fluxos de pré-processamento aplicados às três abordagens de classificação}
-	\begin{tabular}{|p{4.5cm}|c|c|c|}
+\begin{table}[!htbp]
+	\caption{Comparativo entre os fluxos de pré-processamento aplicados às três abordagens de classificação}
+	\label{tab:comparativo_preproc}
+	\begin{tabular}{p{4.5cm}ccc}
 		\hline
 		\textbf{Etapa} & \textbf{Léxico (\texttt{clean()})} & \textbf{FinBERT-PT-BR} & \textbf{BERTimbau} \\
 		\hline
 		Substituição de URLs & \includegraphics[width=0.5cm]{USPSC-TA-Textual/png/check-48.png} & \includegraphics[width=0.5cm]{USPSC-TA-Textual/png/check-48.png} & \includegraphics[width=0.5cm]{USPSC-TA-Textual/png/check-48.png} \\
-		
-		Emojis → \textit{name codes} & \includegraphics[width=0.5cm]{USPSC-TA-Textual/png/check-48.png} & — & — \\
-		
-		Remoção de emojis & — & \includegraphics[width=0.5cm]{USPSC-TA-Textual/png/check-48.png} & \includegraphics[width=0.5cm]{USPSC-TA-Textual/png/check-48.png} \\
-		
+		\hline
+		Emojis → \textit{name codes} & \includegraphics[width=0.5cm]{USPSC-TA-Textual/png/check-48.png} & --- & --- \\
+		\hline
+		Remoção de emojis & --- & \includegraphics[width=0.5cm]{USPSC-TA-Textual/png/check-48.png} & \includegraphics[width=0.5cm]{USPSC-TA-Textual/png/check-48.png} \\
+		\hline
 		Substituição de menções & \includegraphics[width=0.5cm]{USPSC-TA-Textual/png/check-48.png} & \includegraphics[width=0.5cm]{USPSC-TA-Textual/png/check-48.png} & \includegraphics[width=0.5cm]{USPSC-TA-Textual/png/check-48.png} \\
-		
+		\hline
 		Remoção de \texttt{\#} & \includegraphics[width=0.5cm]{USPSC-TA-Textual/png/check-48.png} & \includegraphics[width=0.5cm]{USPSC-TA-Textual/png/check-48.png} & \includegraphics[width=0.5cm]{USPSC-TA-Textual/png/check-48.png} \\
-		
+		\hline
 		Normalização de espaços & \includegraphics[width=0.5cm]{USPSC-TA-Textual/png/check-48.png} & \includegraphics[width=0.5cm]{USPSC-TA-Textual/png/check-48.png} & \includegraphics[width=0.5cm]{USPSC-TA-Textual/png/check-48.png} \\
-		
+		\hline
 		Normalização de caixa & \includegraphics[width=0.5cm]{USPSC-TA-Textual/png/check-48.png} & \includegraphics[width=0.5cm]{USPSC-TA-Textual/png/check-48.png} & \includegraphics[width=0.5cm]{USPSC-TA-Textual/png/check-48.png} \\
-		
-		Remoção de \textit{stopwords} & \includegraphics[width=0.5cm]{USPSC-TA-Textual/png/check-48.png} & — & — \\
-		
-		Lematização & \includegraphics[width=0.5cm]{USPSC-TA-Textual/png/check-48.png} & — & — \\
+		\hline
+		Remoção de \textit{stopwords} & \includegraphics[width=0.5cm]{USPSC-TA-Textual/png/check-48.png} & --- & --- \\
+		\hline
+		Lematização & \includegraphics[width=0.5cm]{USPSC-TA-Textual/png/check-48.png} & --- & --- \\
 		\hline
 	\end{tabular}
 
 	\legend{Fonte: Elaborado pelo autor com base no código-fonte de \texttt{app/shared/text\_cleaner.py}, \texttt{app/core/processing/bert/finbert\_ptbr.py} e \texttt{app/core/processing/bert/bert\_timbau.py}.}
-	\end{quadro}
+	\end{table}
 	
 	
 \subsection{Fluxo Reduzido --- BERTimbau Ajustado}
