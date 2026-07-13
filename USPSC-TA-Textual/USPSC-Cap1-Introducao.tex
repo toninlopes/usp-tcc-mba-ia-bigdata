@@ -13,7 +13,7 @@ Nesse contexto, emerge a seguinte questão de pesquisa: como estruturar e quanti
 
 Estudos internacionais já demonstraram que o sentimento expresso em mídias sociais mantém relação mensurável com o comportamento do mercado financeiro - \citeonline{bollen2011}, por exemplo, identificaram associação estatisticamente significante entre o humor coletivo expresso no Twitter e as variações do mercado de ações norte-americano. No entanto, análises robustas e validadas dessa relação para o mercado brasileiro ainda são escassas. As particularidades linguísticas do português brasileiro, a estrutura diferenciada do mercado de capitais nacional e a limitada disponibilidade de datasets rotulados de qualidade representam desafios específicos que dificultam a transferência direta de soluções desenvolvidas para outros contextos \cite{santos2023finbert}.
 
-A literatura nacional acerca do sentimento do investidor no mercado brasileiro permanece incipiente \cite{galdi2018}, com poucos trabalhos dedicados à construção de modelos de PLN específicos para o domínio financeiro em português. Iniciativas recentes, como o desenvolvimento do FinBERT-PT-BR \cite{santos2023finbert}, representam avanços importantes ao treinar modelos baseados na arquitetura BERT com 1,4 milhão de textos financeiros em português, porém ainda enfrentam limitações quanto ao tamanho das bases de dados rotuladas (apenas 503 textos anotados manualmente\footnote{A base de dados de 503 textos anotados manualmente é descrita em \citeonline{santos2023finbert}. O dataset não está disponível publicamente de forma independente; o modelo resultante pode ser acessado em: \url{https://huggingface.co/lucas-leme/FinBERT-PT-BR}.}).
+Iniciativas recentes, como o desenvolvimento do FinBERT-PT-BR \cite{santos2023finbert}, representam avanços importantes ao treinar modelos baseados na arquitetura BERT com 1,4 milhão de textos financeiros em português, porém ainda enfrentam limitações quanto ao tamanho das bases de dados rotuladas (apenas 503 textos anotados manualmente\footnote{A base de dados de 503 textos anotados manualmente é descrita em \citeonline{santos2023finbert}. O dataset não está disponível publicamente de forma independente; o modelo resultante pode ser acessado em: \url{https://huggingface.co/lucas-leme/FinBERT-PT-BR}.}).
 
 
 \section{Justificativa}
@@ -29,18 +29,18 @@ Do ponto de vista prático, a capacidade de monitorar e quantificar o sentimento
 
 \subsection{Objetivo Geral}
 
-Desenvolver e validar pipeline de Processamento de Linguagem Natural (PLN) para análise de sentimento de publicações financeiras no X/Twitter, caracterizando padrões temporais e semânticos do discurso financeiro brasileiro.
+Desenvolver e validar pipeline de Processamento de Linguagem Natural (PLN) para análise de sentimento de publicações financeiras no X/Twitter, caracterizando padrões semânticos do discurso financeiro brasileiro.
 
 \subsection{Objetivos Específicos}
 
 \begin{enumerate}
-	\item Coletar e estruturar um dataset de publicações do X/Twitter dos veículos InfoMoney e Exame, abrangendo o período de outubro de 2025 a fevereiro de 2026;
+	\item Coletar e estruturar um dataset de publicações do X/Twitter dos veículos InfoMoney e InvestingBrasil, abrangendo o período de outubro de 2025 a fevereiro de 2026;
 	
-	\item Realizar Análise Exploratória dos Dados (AED) e aplicar técnicas de pré-processamento para detecção e remoção de dados redundantes e valores atípicos (\textit{outliers});
+	\item Realizar Análise Exploratória dos Dados (AED) para identificação de dados redundantes e valores atípicos (\textit{outliers}) no dataset coletado;
 	
-	\item Desenvolver um pipeline de pré-processamento e análise de sentimento baseado em PLN para classificação da polaridade dos textos coletados;
+	\item Desenvolver um pipeline de pré-processamento textual e classificação de sentimento baseado em PLN para determinação da polaridade dos textos coletados;
 	
-	\item Avaliar e comparar o desempenho de diferentes abordagens de classificação de sentimento - baseadas em léxico e em modelos de linguagem pré-treinados - no domínio financeiro em português brasileiro;
+	\item Avaliar e comparar o desempenho de diferentes abordagens de classificação de sentimento --- baseadas em léxico e em modelos de linguagem pré-treinados --- no domínio financeiro em português brasileiro;
 	
 	\item Caracterizar descritivamente o dataset resultante, identificando a distribuição de polaridade e os padrões semânticos predominantes no discurso financeiro dos veículos analisados.
 	
@@ -49,7 +49,7 @@ Desenvolver e validar pipeline de Processamento de Linguagem Natural (PLN) para 
 
 \section{Delimitação do Escopo}
 
-Como \textit{proxy} para captura de sentimento de mercado, serão utilizadas publicações da rede social X (anteriormente Twitter) de veículos especializados em economia e finanças: InfoMoney e Exame. O período de análise compreenderá publicações entre 10 de outubro de 2025 e 6 de fevereiro de 2026, totalizando aproximadamente quatro meses de dados.
+Como \textit{proxy} para captura de sentimento de mercado, serão utilizadas publicações da rede social X (anteriormente Twitter) de veículos especializados em economia e finanças: InfoMoney e InvestingBrasil. O período de análise compreenderá publicações entre 10 de outubro de 2025 e 6 de fevereiro de 2026, totalizando aproximadamente quatro meses de dados.
 
 A delimitação desse recorte temporal decorre de um conjunto de restrições metodológicas e operacionais: (i) o acesso à API do X/Twitter está condicionado a planos comerciais com janelas históricas limitadas, inviabilizando a coleta retroativa de grandes volumes de dados sem custos elevados; e (ii) o custo de acesso a planos de API com maior capacidade de recuperação histórica representa uma barreira concreta para pesquisas acadêmicas sem financiamento dedicado. Reconhece-se que esse recorte constitui uma limitação do estudo, cujos impactos serão discutidos no Capítulo \ref{Cap:Conclusoes}.
 
@@ -65,6 +65,6 @@ O Capítulo \ref{Cap:Fundamentacao_Teorica} apresenta a revisão de literatura, 
 
 O Capítulo \ref{Cap:Metodologia} descreve em detalhes a metodologia proposta, incluindo: o processo de coleta de dados via API do X/Twitter; a análise exploratória e o tratamento do dataset; e o pipeline de PLN para extração de features semânticas e classificação de polaridade dos textos coletados.
 
-O Capítulo \ref{Cap:Ava_Exp} apresenta os resultados da análise de sentimento realizada, incluindo a caracterização descritiva do dataset, os padrões temporais e semânticos identificados no discurso financeiro dos veículos analisados e a discussão dos achados à luz da literatura.
+O Capítulo \ref{Cap:Ava_Exp} apresenta os resultados da análise de sentimento realizada, incluindo a caracterização descritiva do dataset, os padrões semânticos identificados no discurso financeiro dos veículos analisados e a discussão dos achados à luz da literatura.
 
 Por fim, o Capítulo \ref{Cap:Conclusoes} sintetiza as principais conclusões do trabalho, discute as contribuições científicas e práticas da pesquisa, apresenta as limitações encontradas e sugere direcionamentos para trabalhos futuros.

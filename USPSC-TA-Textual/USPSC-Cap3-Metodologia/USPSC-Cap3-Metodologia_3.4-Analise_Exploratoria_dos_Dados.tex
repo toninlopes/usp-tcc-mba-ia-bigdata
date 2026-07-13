@@ -6,22 +6,19 @@
 \section{Análise Exploratória dos Dados}
 \label{sec:eda}
 
-Após a coleta e persistência dos registros no banco de dados PostgreSQL, o corpus foi submetido a uma Análise Exploratória dos Dados (AED) com três objetivos: (i)~caracterizar a dimensão e a composição do conjunto coletado; (ii)~verificar a completude dos campos e identificar valores ausentes; e (iii)~examinar a distribuição do comprimento dos textos e detectar publicações atípicas que pudessem comprometer a etapa de classificação de sentimento. A AED foi implementada em Python como o terceiro estágio do \textit{pipeline} (\texttt{app/dashboard/}), estruturado em dois módulos Streamlit com responsabilidades complementares, ambos acessados via \texttt{streamlit run app/dashboard/app.py}:
+Após a coleta e persistência dos registros no banco de dados PostgreSQL, o corpus foi submetido a uma Análise Exploratória dos Dados (AED) com três objetivos: (i)~caracterizar a dimensão e a composição do conjunto coletado; (ii)~verificar a completude dos campos e identificar valores ausentes; e (iii)~examinar a distribuição do comprimento dos textos e detectar publicações atípicas que pudessem comprometer a etapa de classificação de sentimento. A AED foi implementada em Python como o terceiro estágio do \textit{pipeline} (\texttt{app/dashboard/}), acessado via \texttt{streamlit run app/dashboard/app.py}:
 
 \begin{itemize}
-	\item \texttt{app/dashboard/pages/exploration.py}: responsável pela análise textual do corpus — dimensões do conjunto, completude dos campos, distribuição do comprimento dos textos (caracteres e tokens) e
-	identificação de publicações atípicas;
-	
-	\item \texttt{app/dashboard/pages/eda.py}: responsável pela visualização da distribuição de sentimentos e de relevância financeira entre as publicações já rotuladas, por meio de gráficos de setores interativos.
+	\item \texttt{app/dashboard/pages/exploration.py}: responsável pela análise textual do corpus --- dimensões do conjunto, completude dos campos, distribuição do comprimento dos textos (caracteres e tokens) e identificação de publicações atípicas --- bem como pela visualização da distribuição de sentimentos e de relevância financeira entre as publicações já rotuladas, por meio de gráficos interativos.
 \end{itemize}
 
-Ambos os módulos obtêm os dados diretamente do banco de dados PostgreSQL via \texttt{app/shared/db/database.py}, com o auxílio das bibliotecas \texttt{pandas}, \texttt{plotly} e \texttt{streamlit}. Os resultados das subseções a seguir são provenientes do módulo \texttt{eda.py}.
+Ambos os módulos obtêm os dados diretamente do banco de dados PostgreSQL via \texttt{app/shared/db/database.py}, com o auxílio das bibliotecas \texttt{pandas}, \texttt{plotly} e \texttt{streamlit}. Os resultados das subseções a seguir são provenientes do módulo \texttt{exploration.py}.
 
 
 \subsection{Dimensões do Corpus e Distribuição por Veículo}
 \label{subsec:dimensoes}
 
-O corpus final, exportado após o encerramento da coleta, é composto por \textbf{3.563 publicações}, distribuídas entre dois veículos monitorados conforme o \autoref{tab:dist_veiculo}. O InfoMoney responde pela ampla maioria das publicações (88,5\% do total), enquanto o InvestingBrasil contribui com os 11,5\% restantes. Essa assimetria reflete diferenças estruturais no ritmo de publicação das contas institucionais e deve ser considerada na etapa de construção do índice de sentimento agregado.
+O corpus final, exportado após o encerramento da coleta, é composto por \textbf{3.563 publicações}, distribuídas entre dois veículos monitorados conforme o \autoref{tab:dist_veiculo}. O InfoMoney responde pela ampla maioria das publicações (88,5\% do total), enquanto o InvestingBrasil contribui com os 11,5\% restantes. Essa assimetria reflete diferenças estruturais no ritmo de publicação das contas institucionais e deve ser considerada na interpretação dos resultados de sentimento por veículo.
 
 \begin{table}[!htbp]
 	\centering
@@ -178,4 +175,5 @@ No extremo oposto, 678 publicações (19,0\%) ultrapassam 1.000 caracteres e 835
 
 A verificação de duplicatas revelou que \textbf{nenhum registro} apresenta \texttt{tweet\_id} repetido, o que confirma a eficácia da restrição \texttt{UNIQUE} definida no esquema do banco de dados para prevenir a inserção duplicada de publicações durante ciclos de coleta sobrepostos.
 
-A inspeção por conteúdo textual, contudo, identificou \textbf{31 textos com conteúdo idêntico}, envolvendo 54 registros agrupados em 23 grupos — todos provenientes do InfoMoney. Esse padrão é consistente com a prática editorial de republicar a mesma manchete em momentos distintos para ampliar o alcance da publicação, fenômeno documentado na literatura sobre comportamento de contas institucionais em plataformas de mídia social \cite{santana2024cap34}. Para fins da análise de sentimento, os registros duplicados por conteúdo foram mantidos no corpus, uma vez que correspondem a eventos de publicação reais e independentes; sua eventual influência sobre o índice de sentimento agregado é mitigada pela granularidade temporal da agregação diária.
+
+A inspeção por conteúdo textual, contudo, identificou \textbf{54 registros} distribuídos em 23 grupos de conteúdo idêntico --- todos provenientes do InfoMoney. Esse padrão é consistente com a prática editorial de republicar a mesma manchete em momentos distintos para ampliar o alcance da publicação, fenômeno documentado na literatura sobre comportamento de contas institucionais em plataformas de mídia social \cite{santana2024cap34}. Para fins da análise de sentimento, os registros duplicados por conteúdo foram mantidos no corpus, uma vez que correspondem a eventos de publicação reais e independentes; por se tratarem de republicações do mesmo conteúdo, sua classificação de sentimento tende a ser consistente entre si, o que limita o risco de distorção na distribuição geral de polaridade do corpus.

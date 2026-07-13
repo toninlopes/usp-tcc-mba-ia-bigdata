@@ -88,9 +88,10 @@ Um aspecto técnico relevante diz respeito ao campo \texttt{note\_tweet}: public
 \subsubsection{\textit{Pipeline} de Coleta e Armazenamento}
 \label{subsubsec:pipeline_coleta}
 
-O \textit{pipeline} de coleta é a primeira etapa de uma estrutura modular de seis estágios. Os módulos que compõem essa etapa, com suas responsabilidades bem delimitadas, são:
+O \textit{pipeline} de coleta é a primeira etapa de uma estrutura modular de seis estágios\footnote{O código-fonte completo do \textit{pipeline}, incluindo todos os módulos e arquivos referenciados ao longo deste trabalho, está disponível em: \url{https://github.com/toninlopes/x-sentimento-financeiro-bertimbau/tree/v1.0.0-tcc}. Para acessar diretamente um arquivo específico, basta concatenar esse endereço (substituindo \texttt{tree} por \texttt{blob}) ao caminho relativo do arquivo — por exemplo, a classe \texttt{TwitterAPIExtractor}, definida no arquivo \texttt{app/core/extraction/twitter\_api.py}, pode ser consultada em: \url{https://github.com/toninlopes/x-sentimento-financeiro-bertimbau/blob/v1.0.0-tcc/app/core/extraction/twitter_api.py}.}. Os módulos que compõem essa etapa, com suas responsabilidades bem delimitadas, são:
 
 \begin{itemize}
+
 	\item \texttt{app/core/extraction/twitter\_api.py}: a classe \texttt{TwitterAPIExtractor} herda da classe abstrata \texttt{BaseExtractor} e é responsável pela construção e execução das requisições HTTP à API via biblioteca \texttt{requests}. Recebe como parâmetros o identificador do usuário (\texttt{x\_user\_id}), o intervalo temporal e, opcionalmente, o token de paginação;
 	
 	\item \texttt{app/core/extraction/base\_extractor.py}: define a classe abstrata \texttt{BaseExtractor} (ABC), que estabelece o contrato de interface para qualquer extrator de dados do \textit{pipeline}, garantindo extensibilidade para futuras fontes de dados além do X/Twitter;
