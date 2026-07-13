@@ -16,13 +16,13 @@ A \autoref{tab:comparativa_geral} consolida os resultados das quatro abordagens 
 		\hline
 		\textbf{Abordagem}  & \textbf{Acurácia} & \textbf{F1 Pos} & \textbf{F1 Neu} & \textbf{F1 Neg} & \textbf{F1 Macro} \\
 		\hline
-		OpLexicon v3.0      & 0,24              & 0,28            & 0,21            & 0,19            & 0,23              \\
+		OpLexicon v3.0      & 0,26              & 0,29            & 0,22            & 0,28            & 0,26              \\
 		\hline
-		SentiLex-PT         & 0,29              & 0,29            & 0,29            & 0,28            & 0,29              \\
+		SentiLex-PT         & 0,29              & 0,29            & 0,31            & 0,27            & 0,29              \\
 		\hline
 		FinBERT-PT-BR       & 0,40              & 0,44            & 0,45            & 0,32            & 0,40              \\
 		\hline
-		BERTimbau (FT)      & \textbf{0,89}     & \textbf{0,80}   & \textbf{0,93}   & \textbf{0,75}   & \textbf{0,83}     \\
+		BERTimbau (FT)      & \textbf{0,90}     & \textbf{0,82}   & \textbf{0,94}   & \textbf{0,73}   & \textbf{0,83}     \\
 		\hline
 	\end{tabular}
 	\legend{Fonte: Elaborada pelo autor. (FT) = \textit{fine-tuned} sobre o corpus local.}
@@ -32,9 +32,9 @@ A \autoref{tab:comparativa_geral} consolida os resultados das quatro abordagens 
 \subsection{Hierarquia de Desempenho}
 \label{subsec:hierarquia}
 
-Os resultados estabelecem uma hierarquia clara entre as abordagens, ordenada por complexidade metodológica crescente: OpLexicon < SentiLex-PT < FinBERT-PT-BR $\ll$ BERTimbau ajustado. O salto de desempenho mais expressivo ocorre entre o FinBERT-PT-BR e o BERTimbau ajustado: a adaptação ao gênero e ao subdomínio via \textit{fine-tuning} local produziu ganhos de 48,8 pontos percentuais em acurácia e 42,3 pontos em F1-score macro, valores que colocam o BERTimbau ajustado como a única abordagem com desempenho praticamente utilizável para classificação de sentimento neste corpus.
+Os resultados estabelecem uma hierarquia clara entre as abordagens, ordenada por complexidade metodológica crescente: OpLexicon < SentiLex-PT < FinBERT-PT-BR $\ll$ BERTimbau ajustado. O salto de desempenho mais expressivo ocorre entre o FinBERT-PT-BR e o BERTimbau ajustado: a adaptação ao gênero e ao subdomínio via \textit{fine-tuning} local produziu ganhos de 49,1 pontos percentuais em acurácia e 42,4 pontos em F1-score macro, valores que colocam o BERTimbau ajustado como a única abordagem com desempenho praticamente utilizável para classificação de sentimento neste corpus.
 
-Entre as abordagens léxicas, o SentiLex-PT supera marginalmente o OpLexicon em F1-score macro (28,88\% versus 22,53\%), diferença atribuível, em parte, à maior cobertura morfológica do SentiLex-PT, que inclui entradas anotadas com classes gramaticais e permite maior precisão na recuperação de termos flexionados. Nenhuma das duas abordagens, contudo, supera o limiar de desempenho de um classificador por maioria de classe --- que obteria acurácia de 71,3\% ao classificar todas as instâncias como neutro --- evidenciando que a tarefa não pode ser resolvida por correspondência léxica simples neste tipo de corpus.
+Entre as abordagens léxicas, o SentiLex-PT supera marginalmente o OpLexicon em F1-score macro (29,00\% versus 26,12\%), diferença atribuível, em parte, à maior cobertura morfológica do SentiLex-PT, que inclui entradas anotadas com classes gramaticais e permite maior precisão na recuperação de termos flexionados. Nenhuma das duas abordagens, contudo, supera o limiar de desempenho de um classificador por maioria de classe --- que obteria acurácia de 71,3\% ao classificar todas as instâncias como neutro --- evidenciando que a tarefa não pode ser resolvida por correspondência léxica simples neste tipo de corpus.
 
 \subsection{Desempenho nas Classes Minoritárias}
 \label{subsec:classes_minoritarias}
@@ -50,25 +50,27 @@ O desempenho nas classes minoritárias (positivo e negativo) é o discriminador 
 		& \multicolumn{2}{c}{\textbf{Positivo}} & \multicolumn{2}{c}{\textbf{Neutro}} & \multicolumn{2}{c}{\textbf{Negativo}} \\
 		\textbf{Abordagem} & \textbf{P}   & \textbf{R}              & \textbf{P}  & \textbf{R}            & \textbf{P}   & \textbf{R}              \\
 		\hline
-		OpLexicon v3.0     & 0,17         & 0,81                    & 0,78        & 0,12                  & 0,19         & 0,19                    \\
+		OpLexicon v3.0     & 0,18         & 0,68                    & 0,81        & 0,13                  & 0,20         & 0,46                    \\
 		\hline
-		SentiLex-PT        & 0,19         & 0,61                    & 0,75        & 0,18                  & 0,20         & 0,50                    \\
+		SentiLex-PT        & 0,19         & 0,59                    & 0,78        & 0,20                  & 0,18         & 0,48                    \\
 		\hline
 		FinBERT-PT-BR      & 0,41         & 0,47                    & 0,88        & 0,30                  & 0,20         & 0,88                    \\
 		\hline
-		BERTimbau (FT)     & 0,85         & 0,76                    & 0,90        & 0,97                  & 0,89         & 0,65                    \\
+		BERTimbau (FT)     & 0,84         & 0,80                    & 0,91        & 0,97                  & 0,88         & 0,62                    \\
 		\hline
 	\end{tabular}
 	\legend{Fonte: Elaborada pelo autor.}
 \end{table}
 
-As abordagens léxicas apresentam revocação aparentemente elevada para a classe positivo (OpLexicon: 81\%; SentiLex-PT: 61\%), mas com precisão inferior a 20\%, o que indica que a maioria das predições positivas é incorreta --- a proporção de verdadeiros positivos no total de predições positivas é baixíssima. Esse padrão reflete a tendência das abordagens léxicas de superclassificar instâncias como positivo quando o vocabulário não apresenta polaridade negativa explícita, mesmo que o conteúdo seja factual e neutro.
+As abordagens léxicas apresentam revocação aparentemente elevada para a classe positivo (OpLexicon: 68\%; SentiLex-PT: 59\%), mas com precisão inferior a 20\%, o que indica que a maioria das predições positivas é incorreta --- a proporção de verdadeiros positivos no total de predições positivas é baixíssima. Esse padrão reflete a tendência das abordagens léxicas de superclassificar instâncias como positivo quando o vocabulário não apresenta polaridade negativa explícita, mesmo que o conteúdo seja factual e neutro.
 
 O FinBERT-PT-BR apresenta o inverso para a classe negativo: revocação de 88\% com precisão de apenas 20\%, confirmando o viés pronunciado discutido na \autoref{subsec:res_finbert}. O modelo recupera quase todas as instâncias verdadeiramente negativas, mas ao custo de classificar incorretamente grande parte das neutras como negativas.
 
-O BERTimbau ajustado é a única abordagem que simultaneamente mantém precisão e revocação acima de 65\% para todas as três classes, incluindo as minoritárias. Esse resultado indica que o \textit{fine-tuning} local capacitou o modelo a discriminar os padrões linguísticos específicos das três classes no contexto de publicações financeiras do X/Twitter em português, sem privilegiar sistematicamente nenhuma das classes ao custo das demais.
+O BERTimbau ajustado é a única abordagem que simultaneamente mantém precisão e revocação acima de 60\% para todas as três classes, incluindo as minoritárias. Esse resultado indica que o \textit{fine-tuning} local capacitou o modelo a discriminar os padrões linguísticos específicos das três classes no contexto de publicações financeiras do X/Twitter em português, sem privilegiar sistematicamente nenhuma das classes ao custo das demais.
+
 
 \subsection{Viés de Classe Neutra}
 \label{subsec:vies_neutro}
 
-O tratamento da classe neutra é um indicador relevante da qualidade de cada abordagem para a tarefa específica deste trabalho. Publicações jornalísticas financeiras são predominantemente neutras --- 71,3\% do corpus de teste --- e a correta identificação dessa classe é condição para a geração de um índice de sentimento com distribuição de polaridade fiel ao corpus. A \autoref{tab:comparativa_geral} mostra que somente o BERTimbau ajustado alcança F1-score acima de 0,80 para a classe neutra (F1 = 0,93). As demais abordagens variam entre 0,21 (OpLexicon) e 0,45 (FinBERT-PT-BR) para essa classe, o que implica que seus índices de sentimento subestimariam sistematicamente a proporção de publicações neutras e exageram a fração de publicações com polaridade definida.
+O tratamento da classe neutra é um indicador relevante da qualidade de cada abordagem para a tarefa específica deste trabalho. Publicações jornalísticas financeiras são predominantemente neutras --- 71,3\% do corpus de teste --- e a correta identificação dessa classe é condição para resultados de classificação de sentimento fiéis à distribuição real de polaridade do corpus. A \autoref{tab:comparativa_geral} mostra que somente o BERTimbau ajustado alcança F1-score acima de 0,80 para a classe neutra (F1 = 0,94). As demais abordagens variam entre 0,22 (OpLexicon) e 0,45 (FinBERT-PT-BR) para essa classe, o que implica que essas abordagens subestimariam sistematicamente a proporção de publicações neutras e exagerariam a fração de publicações com polaridade definida.
+

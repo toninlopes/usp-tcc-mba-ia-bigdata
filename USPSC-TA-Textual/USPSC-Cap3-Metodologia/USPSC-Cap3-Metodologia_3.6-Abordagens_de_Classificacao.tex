@@ -12,8 +12,7 @@ Em consonância com o Objetivo Específico~4 estabelecido na \autoref{sec:objeti
 \subsection{Abordagem Baseada em Léxico: OpLexicon}
 \label{subsec:abordagem_lexica}
 
-Métodos baseados em léxico (\textit{lexicon-based}) classificam o sentimento de um texto a partir da correspondência de seus termos a um dicionário de polaridade previamente construído, no qual cada palavra ou expressão recebe um escore de valência positiva, negativa ou neutra \cite{liu2020survey}. A principal vantagem dessa abordagem reside na transparência e na ausência de necessidade de dados de treinamento rotulados. Sua limitação central está na incapacidade de capturar negação,
-ironia e vocabulário específico do domínio não contemplado pelo léxico \cite{loughran2011,kearney2014}.
+Métodos baseados em léxico (\textit{lexicon-based}) classificam o sentimento de um texto a partir da correspondência de seus termos a um dicionário de polaridade previamente construído, no qual cada palavra ou expressão recebe um escore de valência positiva, negativa ou neutra \cite{liu2020survey}. A principal vantagem dessa abordagem reside na transparência e na ausência de necessidade de dados de treinamento rotulados. Sua limitação central está na incapacidade de capturar negação, ironia e vocabulário específico do domínio não contemplado pelo léxico \cite{loughran2011,kearney2014}.
 
 \subsubsection{Escolha do Recurso Léxico}
 \label{subsubsec:escolha_lexico}
@@ -24,24 +23,22 @@ O \textbf{OpLexicon v3.0} foi selecionado como léxico principal por duas razõe
 \subsubsection{Estrutura do Léxico}
 \label{subsubsec:estrutura_lexico}
 
-O OpLexicon v3.0 é distribuído como arquivo de texto tabular (\textit{tab-separated values}) sem cabeçalho, com quatro colunas: \texttt{term} (lema), \texttt{type} (classe gramatical), \texttt{polarity} (polaridade inteira: $+1$, $-1$ ou $0$) e \texttt{polarity\_revision} (origem da entrada: \texttt{A} para revisão manual ou \texttt{C} para atribuição automática). A indexação por lemas — e não por formas flexionadas — é a razão pela qual a lematização constitui etapa obrigatória do pré-processamento para esta abordagem, conforme detalhado na \autoref{subsec:fluxo_lexico}.
+O OpLexicon v3.0 é distribuído como arquivo de texto tabular (\textit{tab-separated values}) sem cabeçalho, com quatro colunas: \texttt{term} (lema), \texttt{type} (classe gramatical), \texttt{polarity} (polaridade inteira: $+1$, $-1$ ou $0$) e \texttt{polarity\_revision} (origem da entrada: \texttt{A} para revisão manual ou \texttt{C} para atribuição automática). A indexação por lemas — e não por formas flexionadas — é a razão pela qual a lematização constitui etapa obrigatória do pré-processamento para esta abordagem, conforme detalhado na \autoref{subsec:fluxo_oplexicon}.
 
 \subsubsection{Implementação e Protocolo de Pontuação}
 \label{subsubsec:protocolo_oplexicon}
 
-A implementação foi realizada no quinto estágio do \textit{pipeline} por meio da classe \texttt{OpLexiconAnalyzer}, definida em \texttt{app/core/processing/lexicon/op\_lexicon.py}. A classe herda de \texttt{BaseSentimentAnalyzer} — a mesma classe abstrata (ABC) que fundamenta o
-\texttt{FinBertPTBRAnalyzer} —, garantindo interface uniforme entre as duas abordagens e extensibilidade para classificadores futuros.
+A implementação foi realizada no quinto estágio do \textit{pipeline} por meio da classe \texttt{OpLexiconAnalyzer}, definida em \texttt{app/core/classification/lexicon/op\_lexicon.py}. A classe herda de \texttt{LexiconSentimentAnalyzer}, que por sua vez herda de \texttt{BaseSentimentAnalyzer} — a mesma classe abstrata (ABC) raiz que fundamenta o
+\texttt{FinBertPTBRAnalyzer} —, garantindo interface uniforme entre as abordagens e extensibilidade para classificadores futuros.
 
 O protocolo de pontuação compreende as seguintes etapas:
 
 \begin{enumerate}
-	\item \textbf{Seleção dos registros}: o método \texttt{run()} recupera exclusivamente as publicações que já possuem classificação humana em \texttt{tweets\_classification} mas ainda não foram processadas pelo OpLexicon, garantindo que a comparação opere sobre o mesmo
-	\textit{gold standard} utilizado pelo FinBERT-PT-BR;
+	\item \textbf{Seleção dos registros}: o método \texttt{run()} recupera exclusivamente as publicações que já possuem classificação humana em \texttt{tweets\_classification} mas ainda não foram processadas pelo OpLexicon, garantindo que a comparação opere sobre o mesmo 	\textit{gold standard} utilizado pelo FinBERT-PT-BR;
+		
+	\item \textbf{Pré-processamento}: cada texto é submetido ao método \texttt{preprocess()}, que aplica a configuração descrita na \autoref{subsec:fluxo_oplexicon} (nove etapas, incluindo lematização via \texttt{spaCy}) — etapa obrigatória para maximizar a taxa de correspondência com as entradas do léxico, que indexa lemas e não formas flexionadas;
 	
-	\item \textbf{Pré-processamento}: cada texto é submetido ao método \texttt{preprocess()}, que aplica o fluxo completo descrito na \autoref{subsec:fluxo_lexico}, incluindo lematização via \texttt{spaCy} — etapa obrigatória para maximizar a taxa de correspondência com as entradas do léxico, que indexa lemas e não formas flexionadas;
-	
-	\item \textbf{Carregamento do léxico}: o método \texttt{load\_model()} lê o arquivo \texttt{lexico\_v3.0.txt} e constrói um dicionário em memória no formato
-	\texttt{\{lema: polaridade\}}, com tempo de carga desprezível e sem demanda de GPU;
+	\item \textbf{Carregamento do léxico}: o método \texttt{load\_model()} lê o arquivo \texttt{lexico\_v3.0.txt} e constrói um dicionário em memória no formato \texttt{\{lema: polaridade\}}, com tempo de carga desprezível e sem demanda de GPU;
 	
 	\item \textbf{Pontuação agregada}: para cada \textit{token} do texto pré-processado, consulta-se o dicionário léxico. \textit{Tokens} ausentes recebem pontuação zero e são excluídos da agregação. A polaridade final é calculada pela média aritmética dos escores dos \textit{tokens} com entrada no léxico, conforme a \autoref{eq:oplexicon_score}:
 \end{enumerate}
@@ -56,8 +53,7 @@ no léxico. Caso $T^{*} = \emptyset$, o texto é classificado como Neutro com es
 
 \begin{enumerate}
 	\setcounter{enumi}{4}
-	\item \textbf{Limiarização}: a classe final é determinada por um limiar $\theta = 0{,}05$ aplicado à média $\bar{p}$: se $\bar{p} > \theta$, a publicação é classificada como Positivo; se $\bar{p} < -\theta$, como Negativo; caso contrário, como Neutro. O valor reduzido do limiar reflete a alta proporção esperada de \textit{tokens} financeiros sem correspondência no léxico (siglas de ativos, nomes de emissores, jargão de derivativos), que dilui a magnitude da média
-	sem necessariamente indicar neutralidade semântica;
+	\item \textbf{Limiarização}: a classe final é determinada por um limiar $\theta = 0{,}05$ aplicado à média $\bar{p}$: se $\bar{p} > \theta$, a publicação é classificada como Positivo; se $\bar{p} < -\theta$, como Negativo; caso contrário, como Neutro. O valor reduzido do limiar reflete a alta proporção esperada de \textit{tokens} financeiros sem correspondência no léxico (siglas de ativos, nomes de emissores, jargão de derivativos), que dilui a magnitude da média sem necessariamente indicar neutralidade semântica;
 	
 	\item \textbf{Persistência}: os resultados são armazenados em \texttt{tweets\_classification} com \texttt{classificator = "OpLexicon"} e o respectivo escore, permitindo comparação direta com as anotações humanas e com o FinBERT-PT-BR na etapa de avaliação (\autoref{subsec:metricas_avaliacao}).
 \end{enumerate}
@@ -122,14 +118,14 @@ O SentiLex-PT02 é distribuído como arquivo de texto simples, com uma entrada p
 \subsubsection{Implementação e Protocolo de Pontuação}
 \label{subsubsec:protocolo_sentilex}
 
-A implementação foi realizada no quinto estágio do \textit{pipeline} por meio da classe \texttt{SentiLexAnalyzer}, definida em \texttt{app/core/processing/lexicon/senti\_lex.py}. A classe herda de \texttt{BaseSentimentAnalyzer} (\texttt{app/core/processing/base\_analyzer.py}), garantindo interface uniforme com o \texttt{OpLexiconAnalyzer} e o \texttt{FinBertPTBRAnalyzer}.
+A implementação foi realizada no quinto estágio do \textit{pipeline} por meio da classe \texttt{SentiLexAnalyzer}, definida em \texttt{app/core/classification/lexicon/senti\_lex.py}. A classe herda de \texttt{LexiconSentimentAnalyzer}, que por sua vez herda de \texttt{BaseSentimentAnalyzer} (\texttt{app/core/classification/base\_analyzer.py}), garantindo interface uniforme com o \texttt{OpLexiconAnalyzer} e o \texttt{FinBertPTBRAnalyzer}.
 
 O protocolo de pontuação compreende as seguintes etapas:
 
 \begin{enumerate}
 	\item \textbf{Seleção dos registros}: o método \texttt{run()} recupera exclusivamente as publicações que já possuem classificação humana em \texttt{tweets\_classification}, utilizadas como \textit{gold standard};
-
-	\item \textbf{Pré-processamento}: cada texto é submetido ao método \texttt{preprocess()}, que aplica o fluxo descrito na \autoref{sec:preprocessamento} --- remoção de URLs, menções, caracteres especiais e conversão para letras minúsculas. Diferentemente do \texttt{OpLexiconAnalyzer}, não é realizada lematização via \texttt{spaCy}, pois o SentiLex-PT02 já contém formas flexionadas;
+	
+	\item \textbf{Pré-processamento}: cada texto é submetido ao método \texttt{preprocess()}, que aplica a configuração descrita na \autoref{subsec:fluxo_sentilex} --- as mesmas oito primeiras etapas do OpLexicon (\autoref{subsec:fluxo_oplexicon}), sem a lematização final. Diferentemente do \texttt{OpLexiconAnalyzer}, não é realizada lematização via \texttt{spaCy}, pois o SentiLex-PT02 já contém formas flexionadas;
 
 	\item \textbf{Carregamento do léxico}: o método \texttt{load\_model()} lê o arquivo \texttt{data/SentiLex- PT02.txt} e constrói um dicionário em memória no formato \texttt{\{forma: polaridade\}}, com tempo de carga desprezível e sem demanda de GPU;
 
@@ -167,23 +163,21 @@ O \textbf{FinBERT-PT-BR} \cite{santos2023finbert} foi selecionado como ferrament
 \subsubsection{Arquitetura do Modelo}
 \label{subsubsec:arquitetura_finbert}
 
-O FinBERT-PT-BR é construído sobre a arquitetura \textbf{BERT} (\textit{Bidirectional Encoder Representations from Transformers}) \cite{devlin2019}, que implementa o mecanismo de atenção multi-cabeça proposto por \citeonline{vaswani2017}. A característica central do BERT — a codificação bidirecional do contexto — permite que a
-representação de cada \textit{token} incorpore informações tanto dos termos que o precedem quanto dos que o sucedem na sequência, o que é particularmente relevante para a interpretação de negações e modificadores de intensidade frequentes no discurso financeiro (e.g., ``\textit{não} sobe'', ``\textit{queda} acentuada'').
+O FinBERT-PT-BR é construído sobre a arquitetura \textbf{BERT} (\textit{Bidirectional Encoder Representations from Transformers}) \cite{devlin2019}, que implementa o mecanismo de atenção multi-cabeça proposto por \citeonline{vaswani2017}. A característica central do BERT — a codificação bidirecional do contexto — permite que a representação de cada \textit{token} incorpore informações tanto dos termos que o precedem quanto dos que o sucedem na sequência, o que é particularmente relevante para a interpretação de negações e modificadores de intensidade frequentes no discurso financeiro (e.g., ``\textit{não} sobe'', ``\textit{queda} acentuada'').
 
-O modelo base utilizado para o \textit{fine-tuning} é o \textbf{BERTimbau} \cite{souza2020}, pré-treinado sobre um corpus de 2,68 bilhões de palavras em português brasileiro. Sobre esse modelo base, \citeonline{santos2023finbert} realizaram o \textit{fine-tuning} para a tarefa de classificação de sentimento financeiro em três classes:
-\textbf{Positivo}, \textbf{Negativo} e \textbf{Neutro}.
+O modelo base utilizado para o \textit{fine-tuning} é o \textbf{BERTimbau} \cite{souza2020}, pré-treinado sobre um corpus de 2,68 bilhões de palavras em português brasileiro. Sobre esse modelo base, \citeonline{santos2023finbert} realizaram o \textit{fine-tuning} para a tarefa de classificação de sentimento financeiro em três classes: \textbf{Positivo}, \textbf{Negativo} e \textbf{Neutro}.
 
 \subsubsection{Implementação e Protocolo de Inferência}
 \label{subsubsec:protocolo_inferencia}
 
-A inferência foi implementada no quinto estágio do \textit{pipeline} (\texttt{app/core/processing /bert/}), por meio da classe \texttt{FinBertPTBRAnalyzer}, definida em \texttt{app/core/processing/ bert/finbert\_ptbr.py}. A classe herda de \texttt{BaseSentimentAnalyzer} (\texttt{app/core/process ing/base\_analyzer.py}), uma classe abstrata (ABC) que estabelece o contrato de interface para qualquer analisador de sentimento no \textit{pipeline}, garantindo extensibilidade para futuros modelos.
+A inferência foi implementada no quinto estágio do \textit{pipeline} (\texttt{app/core/classifi cation/bert/}), por meio da classe \texttt{FinBertPTBRAnalyzer}, definida em \texttt{app/core/classi fication/bert/finbert\_ptbr.py}. A classe herda de \texttt{BertSentimentAnalyzer}, que por sua vez herda de \texttt{BaseSentimentAnalyzer} (\texttt{app/core/classification/base\_analyzer .py}), classe abstrata (ABC) raiz que estabelece o contrato de interface para qualquer analisador de sentimento no \textit{pipeline}, garantindo extensibilidade para futuros modelos.
 
 O protocolo de inferência compreende as seguintes etapas:
 
 \begin{enumerate}
 	\item \textbf{Seleção dos registros}: o método \texttt{run()} recupera via \texttt{app/shared/db/database.py} exclusivamente as publicações que já possuem classificação humana em \texttt{tweets\_classification} mas ainda não foram processadas pelo FinBERT-PT-BR. Esse critério garante que a inferência do modelo opere sobre o mesmo subconjunto utilizado como \textit{gold standard}, permitindo comparação direta entre as duas abordagens;
 	
-	\item \textbf{Pré-processamento}: cada texto é submetido ao método \texttt{preprocess()} da própria classe, que aplica o fluxo reduzido descrito na \autoref{subsec:fluxo_finbert} — substituição de URLs e menções, remoção de emojis, remoção do símbolo de \textit{hashtag}, normalização de espaços e normalização de caixa com preservação de entidades financeiras;
+	\item \textbf{Pré-processamento}: cada texto é submetido ao método \texttt{preprocess()} da própria classe, que aplica a configuração descrita na \autoref{subsec:fluxo_finbert} --- uma única etapa de normalização de espaçamento, selecionada empiricamente por apresentar a maior concordância humano-modelo entre as configurações testadas para esta abordagem;
 	
 	\item \textbf{Carregamento do modelo}: o tokenizador e o modelo são instanciados via \texttt{AutoToke nizer} e \texttt{BertForSequenceClassification}, encapsulados em um objeto \texttt{pipeline} da biblioteca \texttt{transformers} com \texttt{task="text-classification"};
 	
@@ -191,7 +185,7 @@ O protocolo de inferência compreende as seguintes etapas:
 	
 	\item \textbf{Mapeamento de \textit{labels}}: os rótulos em inglês retornados pelo modelo são normalizados para o português: \texttt{POSITIVE} → \texttt{positivo}, 	\texttt{NEGATIVE} → \texttt{negativo}, \texttt{NEUTRAL} → \texttt{neutro};
 	
-	\item \textbf{Persistência e visualização}: os resultados são armazenados em \texttt{tweets\_classifi cation} com \texttt{classificator = "FinBERT-PT-BR"} e o respectivo 	\texttt{score}. O painel Streamlit de processamento (\texttt{app/dashboard/pages/processing.py}), invocado via \texttt{make dashboard}, apresenta a comparação entre o sentimento predito pelo modelo e o sentimento anotado pelo humano tweet a tweet, além de métricas de concordância.
+	\item \textbf{Persistência e visualização}: os resultados são armazenados em \texttt{tweets\_classifi cation} com \texttt{classificator = "FinBERT-PT-BR"} e o respectivo 	\texttt{score}. O painel Streamlit de processamento (\texttt{app/dashboard/pages/classification.py}), invocado via \texttt{make dashboard}, apresenta a comparação entre o sentimento predito pelo modelo e o sentimento anotado pelo humano tweet a tweet, além de métricas de concordância.
 \end{enumerate}
 
 \subsection{Abordagem Baseada em Modelo de Linguagem Pré-treinado com \textit{Fine-tuning}: BERTimbau}
@@ -215,7 +209,7 @@ O \textbf{BERTimbau} \cite{souza2020} foi selecionado como modelo base para a ab
 
 O modelo base utilizado é o \texttt{neuralmind/bert-base-portuguese-cased}, disponível publicamente no repositório \textit{Hugging Face}. Sobre esse modelo, realiza-se o \textit{fine-tuning} para a tarefa de classificação de sequência em três classes --- \textbf{Positivo}, \textbf{Neutro} e \textbf{Negativo} ---, por meio da adição de uma camada de classificação linear sobre a representação do \textit{token} especial \texttt{[CLS]}, que codifica o sentido global da sequência de entrada \cite{devlin2019}.
 
-O protocolo de \textit{fine-tuning} é implementado no script \texttt{app/core/processing/bert /bert\_timbau\_fine\_tuner.py} e compreende as seguintes decisões de configuração:
+O protocolo de \textit{fine-tuning} é implementado no script \texttt{app/core/fine\_tuning/bert\_timbau\_fine\_tuner.py} e compreende as seguintes decisões de configuração:
 
 \begin{itemize}
 
@@ -237,10 +231,10 @@ O modelo ajustado, o tokenizador e o mapeamento de rótulos (\texttt{id2label.js
 \subsubsection{Implementação e Protocolo de Inferência}
 \label{subsubsec:protocolo_inferencia_bertimbau}
 
-A inferência é implementada pela classe \texttt{BERTimbauAnalyzer}, definida em \texttt{app/core/ processing/bert/bert\_timbau.py}. Assim como \texttt{FinBertPTBRAnalyzer}, a classe herda de \texttt{BaseSentimentAnalyzer} (\texttt{app/core/processing/base\_analyzer.py}), garantindo que ambos os analisadores compartilhem o mesmo contrato de interface e possam ser alternados pelo painel de processamento sem modificações adicionais. O protocolo de inferência é análogo ao descrito na \autoref{subsubsec:protocolo_inferencia}, com as seguintes particularidades:
+A inferência é implementada pela classe \texttt{BERTimbauAnalyzer}, definida em \texttt{app/core /classification/bert/bert\_timbau.py}. Assim como \texttt{FinBertPTBRAnalyzer}, a classe herda de \texttt{BaseSentimentAnalyzer} (\texttt{app/core/classification/base\_analyzer.py}), garantindo que ambos os analisadores compartilhem o mesmo contrato de interface e possam ser alternados pelo painel de processamento sem modificações adicionais. O protocolo de inferência é análogo ao descrito na \autoref{subsubsec:protocolo_inferencia}, com as seguintes particularidades:
 
 \begin{enumerate}
-	\item \textbf{Pré-requisito de treinamento}: a classe verifica na inicialização a existência do diretório \texttt{models/bert-timbau-sentiment/}; caso ausente, emite um erro orientando o usuário a executar \texttt{python -m pipeline.05\_processing.bert\_timbau\_fine\_tuner} (atalho: \texttt{make finetune}) antes da inferência;
+	\item \textbf{Pré-requisito de treinamento}: a classe verifica na inicialização a existência do diretório \texttt{models/bert-timbau-sentiment/}; caso ausente, emite um erro orientando o usuário a executar \texttt{python -m app.core.fine\_tuning.bert\_timbau\_fine\_tuner} antes da inferência;
 	
 	\item \textbf{Carregamento do modelo}: tokenizador e modelo são carregados diretamente do diretório local via \texttt{AutoTokenizer} e \texttt{AutoModelForSequenceClassification}, encapsulados em objeto \texttt{pipeline} da biblioteca \texttt{transformers} com \texttt{task="text-classifi cation"};
 	

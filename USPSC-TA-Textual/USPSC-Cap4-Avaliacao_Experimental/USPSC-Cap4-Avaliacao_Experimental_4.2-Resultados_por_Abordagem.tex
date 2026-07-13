@@ -24,16 +24,16 @@ O OpLexicon~v3.0 \cite{souza2011oplexicon} classifica cada publicação pela pol
 	\begin{tabular}{lcccc}
 		\hline
 		\textbf{Classe}    & \textbf{Precisão} & \textbf{Revocação} & \textbf{F1-Score} & \textbf{Suporte} \\
+		\hline		
+		Positivo           & 0,18              & 0,68               & 0,29              & 59  \\
 		\hline
-		Positivo           & 0,17              & 0,81               & 0,28              & 59  \\
+		Neutro             & 0,81              & 0,13               & 0,22              & 266 \\
 		\hline
-		Neutro             & 0,78              & 0,12               & 0,21              & 266 \\
+		Negativo           & 0,20              & 0,46               & 0,28              & 48  \\
 		\hline
-		Negativo           & 0,19              & 0,19               & 0,19              & 48  \\
+		\textit{Macro avg} & 0,40              & 0,42               & 0,26              & 373 \\
 		\hline
-		\textit{Macro avg} & 0,38              & 0,37               & 0,23              & 373 \\
-		\hline
-		\textit{Acurácia}  & ---               & ---                & 0,24              & 373 \\
+		\textit{Acurácia}  & ---               & ---                & 0,26              & 373 \\
 		\hline
 	\end{tabular}
 	\legend{Fonte: Elaborada pelo autor.}
@@ -48,17 +48,17 @@ O OpLexicon~v3.0 \cite{souza2011oplexicon} classifica cada publicação pela pol
 		\hline
 		& \textbf{Pred. Positivo} & \textbf{Pred. Neutro} & \textbf{Pred. Negativo} \\
 		\hline
-		\textbf{Real Positivo} & 48                      & 4                     & 7                       \\
+		\textbf{Real Positivo} & 40                      & 4                     & 15                      \\
 		\hline
-		\textbf{Real Neutro}   & 202                     & 32                    & 32                      \\
+		\textbf{Real Neutro}   & 157                     & 34                    & 75                      \\
 		\hline
-		\textbf{Real Negativo} & 34                      & 5                     & 9                       \\
+		\textbf{Real Negativo} & 22                      & 4                     & 22                      \\
 		\hline
 	\end{tabular}
 	\legend{Fonte: Elaborada pelo autor.}
 \end{table}
 
-O OpLexicon alcançou acurácia de 23,86\% e F1-score macro de 22,53\%, indicando desempenho sistematicamente inferior ao classificador aleatório estratificado. A matriz de confusão (\autoref{tab:cm_oplexicon}) revela o principal padrão de falha: 202 das 266 publicações neutras (75,9\%) foram classificadas como positivo, evidenciando uma tendência de atribuir polaridade positiva a publicações jornalísticas factuais cujo vocabulário financeiro não carrega sinal negativo explícito. A classe neutro, dominante no corpus, obteve revocação de apenas 12\%, o que significa que a abordagem léxica é incapaz de identificar o padrão de ausência de sentimento predominante neste tipo de dado.
+O OpLexicon alcançou acurácia de 25,74\% e F1-score macro de 26,12\%, indicando desempenho sistematicamente inferior ao classificador aleatório estratificado. A matriz de confusão (\autoref{tab:cm_oplexicon}) revela o principal padrão de falha: 157 das 266 publicações neutras (59,0\%) foram classificadas como positivo, evidenciando uma tendência de atribuir polaridade positiva a publicações jornalísticas factuais cujo vocabulário financeiro não carrega sinal negativo explícito. A classe neutro, dominante no corpus, obteve revocação de apenas 13\%, o que significa que a abordagem léxica é incapaz de identificar o padrão de ausência de sentimento predominante neste tipo de dado.
 
 % ── 4.2.2 SentiLex-PT ────────────────────────────────────────────────────────
 
@@ -75,13 +75,13 @@ O SentiLex-PT \cite{carvalho2015sentilex} é um léxico de sentimentos para o po
 		\hline
 		\textbf{Classe}    & \textbf{Precisão} & \textbf{Revocação} & \textbf{F1-Score} & \textbf{Suporte} \\
 		\hline
-		Positivo           & 0,19              & 0,61               & 0,29              & 59  \\
+		Positivo           & 0,19              & 0,59               & 0,29              & 59  \\
 		\hline
-		Neutro             & 0,75              & 0,18               & 0,29              & 266 \\
+		Neutro             & 0,78              & 0,20               & 0,31              & 266 \\
 		\hline
-		Negativo           & 0,20              & 0,50               & 0,28              & 48  \\
+		Negativo           & 0,18              & 0,48               & 0,27              & 48  \\
 		\hline
-		\textit{Macro avg} & 0,38              & 0,43               & 0,29              & 373 \\
+		\textit{Macro avg} & 0,38              & 0,42               & 0,29              & 373 \\
 		\hline
 		\textit{Acurácia}  & ---               & ---                & 0,29              & 373 \\
 		\hline
@@ -97,25 +97,24 @@ O SentiLex-PT \cite{carvalho2015sentilex} é um léxico de sentimentos para o po
 		\hline
 		& \textbf{Pred. Positivo} & \textbf{Pred. Neutro} & \textbf{Pred. Negativo} \\
 		\hline
-		\textbf{Real Positivo} & 36                      & 6                     & 17                      \\
+		\textbf{Real Positivo} & 35                      & 7                     & 17                      \\
 		\hline
-		\textbf{Real Neutro}   & 138                     & 48                    & 80                      \\
+		\textbf{Real Neutro}   & 129                     & 52                    & 85                      \\
 		\hline
-		\textbf{Real Negativo} & 14                      & 10                    & 24                      \\
+		\textbf{Real Negativo} & 17                      & 8                     & 23                      \\
 		\hline
 	\end{tabular}
 	\legend{Fonte: Elaborada pelo autor.}
 \end{table}
 
-O SentiLex-PT obteve acurácia de 28,95\% e F1-score macro de 28,88\%, ligeiramente superior ao OpLexicon, mas ainda muito abaixo de um classificador por maioria de classe (\textit{majority class baseline}). A matriz de confusão (\autoref{tab:cm_sentilex}) evidencia que 138 das 266 publicações neutras (51,9\%) foram classificadas como positivo, padrão análogo ao observado no OpLexicon. A revocação da classe neutra é igualmente baixa (18\%), confirmando a dificuldade estrutural de abordagens léxicas em reconhecer ausência de polaridade em textos de caráter informativo. O SentiLex-PT distribui mais erros entre positivo e negativo do que o OpLexicon, refletindo diferenças na cobertura léxica de cada recurso.
+O SentiLex-PT obteve acurácia de 29,49\% e F1-score macro de 29,00\%, ligeiramente superior ao OpLexicon, mas ainda muito abaixo de um classificador por maioria de classe (\textit{majority class baseline}). A matriz de confusão (\autoref{tab:cm_sentilex}) evidencia que 129 das 266 publicações neutras (48,5\%) foram classificadas como positivo, padrão análogo ao observado no OpLexicon. A revocação da classe neutra é igualmente baixa (20\%), confirmando a dificuldade estrutural de abordagens léxicas em reconhecer ausência de polaridade em textos de caráter informativo. O SentiLex-PT distribui mais erros entre positivo e negativo do que o OpLexicon, refletindo diferenças na cobertura léxica de cada recurso.
 
 % ── 4.2.3 FinBERT-PT-BR ──────────────────────────────────────────────────────
 
 \subsection{FinBERT-PT-BR}
 \label{subsec:res_finbert}
 
-O FinBERT-PT-BR \cite{santos2023finbert} é um modelo BERT especializado para o domínio financeiro em língua portuguesa, pré-treinado sobre corpus de notícias financeiras. Neste trabalho, o modelo é utilizado em modo de inferência direta (\textit{zero-shot} em relação ao corpus local), sem qualquer ajuste sobre as publicações coletadas, conforme descrito na \autoref{subsubsec:protocolo_inferencia}. Os resultados são apresentados na \autoref{tab:metrics_finbert}.
-
+O FinBERT-PT-BR \cite{santos2023finbert} é um modelo BERT especializado para o domínio financeiro em língua portuguesa, pré-treinado sobre corpus de notícias financeiras. Neste trabalho, o modelo é utilizado em modo de inferência direta (\textit{zero-shot} em relação ao corpus local, sem \textit{fine-tuning} sobre as publicações coletadas), precedido apenas da etapa de normalização de espaçamento descrita na \autoref{subsec:fluxo_finbert}, conforme detalhado na \autoref{subsubsec:protocolo_inferencia}. Os resultados são apresentados na \autoref{tab:metrics_finbert}.
 
 \begin{table}[!htbp]
 	\caption[Métricas de desempenho — FinBERT-PT-BR]{Métricas de desempenho do FinBERT-PT-BR ($n = 373$)}
@@ -174,15 +173,15 @@ O BERTimbau (\texttt{neuralmind/bert-base-portuguese-cased}) \cite{souza2020} fo
 		\hline
 		\textbf{Classe}    & \textbf{Precisão} & \textbf{Revocação} & \textbf{F1-Score} & \textbf{Suporte} \\
 		\hline
-		Positivo           & 0,85              & 0,76               & 0,80              & 59  \\
+		Positivo           & 0,84              & 0,80               & 0,82              & 59  \\
 		\hline
-		Neutro             & 0,90              & 0,97               & 0,93              & 266 \\
+		Neutro             & 0,91              & 0,97               & 0,94              & 266 \\
 		\hline
-		Negativo           & 0,89              & 0,65               & 0,75              & 48  \\
+		Negativo           & 0,88              & 0,62               & 0,73              & 48  \\
 		\hline
-		\textit{Macro avg} & 0,88              & 0,79               & 0,83              & 373 \\
+		\textit{Macro avg} & 0,88              & 0,80               & 0,83              & 373 \\
 		\hline
-		\textit{Acurácia}  & ---               & ---                & 0,89              & 373 \\
+		\textit{Acurácia}  & ---               & ---                & 0,90              & 373 \\
 		\hline
 	\end{tabular}
 	\legend{Fonte: Elaborada pelo autor.}
@@ -197,15 +196,14 @@ O BERTimbau (\texttt{neuralmind/bert-base-portuguese-cased}) \cite{souza2020} fo
 		\hline
 		& \textbf{Pred. Positivo} & \textbf{Pred. Neutro} & \textbf{Pred. Negativo} \\
 		\hline
-		\textbf{Real Positivo} & 45                      & 12                    & 2                       \\
+		\textbf{Real Positivo} & 47                      & 10                    & 2                       \\
 		\hline
 		\textbf{Real Neutro}   & 7                       & 257                   & 2                       \\
 		\hline
-		\textbf{Real Negativo} & 1                       & 16                    & 31                      \\
+		\textbf{Real Negativo} & 2                       & 16                    & 30                      \\
 		\hline
 	\end{tabular}
 	\legend{Fonte: Elaborada pelo autor.}
 \end{table}
 
-
-O BERTimbau ajustado alcançou acurácia de 89,28\% e F1-score macro de 82,78\%, representando ganhos absolutos de 48,8 pontos percentuais em acurácia e 42,3 pontos em F1-score macro em relação ao FinBERT-PT-BR. A matriz de confusão (\autoref{tab:cm_bertimbau}) evidencia que o modelo distribuiu os erros de forma muito mais equilibrada entre as três classes: 257 das 266 instâncias neutras (96,6\%) foram corretamente classificadas, 45 das 59 positivas (76,3\%) e 31 das 48 negativas (64,6\%). Diferentemente do FinBERT-PT-BR, o BERTimbau ajustado não apresenta viés sistemático em favor de nenhuma classe; os erros residuais concentram-se principalmente em confusão entre neutro e as classes minoritárias (12 positivos classificados como neutro e 16 negativos como neutro), um padrão esperado dado o desequilíbrio de classes no corpus.
+O BERTimbau ajustado alcançou acurácia de 89,54\% e F1-score macro de 82,84\%, representando ganhos absolutos de 49,1 pontos percentuais em acurácia e 42,4 pontos em F1-score macro em relação ao FinBERT-PT-BR. A matriz de confusão (\autoref{tab:cm_bertimbau}) evidencia que o modelo distribuiu os erros de forma muito mais equilibrada entre as três classes: 257 das 266 instâncias neutras (96,6\%) foram corretamente classificadas, 47 das 59 positivas (79,7\%) e 30 das 48 negativas (62,5\%). Diferentemente do FinBERT-PT-BR, o BERTimbau ajustado não apresenta viés sistemático em favor de nenhuma classe; os erros residuais concentram-se principalmente em confusão entre neutro e as classes minoritárias (10 positivos classificados como neutro e 16 negativos como neutro), um padrão esperado dado o desequilíbrio de classes no corpus.

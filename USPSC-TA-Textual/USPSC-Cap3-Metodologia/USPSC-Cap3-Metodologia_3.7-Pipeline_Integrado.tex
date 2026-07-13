@@ -24,8 +24,8 @@ O \textit{pipeline} é estruturado em seis etapas sequenciais, conforme ilustrad
 	\item \textbf{AED e pré-processamento textual}: o corpus rotulado é inspecionado estatisticamente e submetido às transformações linguísticas descritas nas Seções~\ref{sec:eda} 	e~\ref{sec:preprocessamento};
 	
 	\item \textbf{Classificação de sentimento}: o corpus pré-processado é submetido às quatro abordagens de classificação de sentimento descritas na \autoref{sec:abordagens}: (a)~abordagem léxica via OpLexicon~v3.0; (b)~abordagem léxica via SentiLex-PT; (c)~abordagem neural via FinBERT-PT-BR; e (d)~abordagem neural via BERTimbau ajustado. Todas gravam os resultados em \texttt{tweets\_classification} com o respectivo campo \texttt{classificator}, permitindo comparação direta com o \textit{gold standard} humano na etapa de avaliação;
-
-	\item \textbf{Agregação e análise}: as classificações individuais são agregadas temporalmente e os resultados são comparados entre as abordagens e analisados à luz do contexto macroeconômico do período, conforme apresentado no \autoref{Cap:Ava_Exp}.
+	
+	\item \textbf{Comparação e análise}: as classificações individuais são comparadas entre as abordagens e analisadas à luz do contexto macroeconômico e financeiro do período, conforme apresentado no \autoref{Cap:Ava_Exp}.
 \end{enumerate}
 
 \begin{figure}[!htb]
@@ -45,16 +45,16 @@ O \textit{pipeline} é estruturado em seis etapas sequenciais, conforme ilustrad
 			\node[box, right=of db] (rotul) {Rotulagem\\Manual};
 			\node[box, right=of rotul] (preproc) {AED e\\Pré-proc.};
 			\node[box, right=of preproc] (classif) {Classificação\\Sentimento};
-			\node[box, right=of classif] (agreg) {Agregação\\e Análise};
+			\node[box, right=of classif] (compar) {Comparação\\e Análise};
 			
 			\node[above=0.35cm of coleta, font=\scriptsize] {API X/Twitter};
-			\node[above=0.35cm of agreg,  font=\scriptsize] {Índice de Sentimento};
+			\node[above=0.35cm of compar,  font=\scriptsize] {Resultados por Abordagem};
 			
 			\draw[arrow] (coleta)   -- (db);
 			\draw[arrow] (db)       -- (rotul);
 			\draw[arrow] (rotul)    -- (preproc);
 			\draw[arrow] (preproc)  -- (classif);
-			\draw[arrow] (classif)  -- (agreg);
+			\draw[arrow] (classif)  -- (compar);
 			
 			\node[below=0.30cm of coleta,  font=\scriptsize] {Bearer Token};
 			\node[below=0.30cm of db,      font=\scriptsize] {tabela \texttt{tweets}};
@@ -86,10 +86,10 @@ A implementação foi realizada na linguagem \textbf{Python 3.11}, escolhida por
 		\texttt{psycopg2} & $\geq$ 2.9 & Interface de comunicação com o banco de dados PostgreSQL \\
 		
 		\hline
-		\texttt{streamlit} & $\geq$ 1.35 & Ferramenta de anotação manual (\textit{Classifier App}) e painel de AED (\texttt{eda.py}) \\
+		\texttt{streamlit} & $\geq$ 1.35 & Ferramenta de anotação manual (\textit{Classifier App}) e painel de AED (\texttt{exploration.py}) \\
 		
 		\hline
-		\texttt{pandas} & $\geq$ 2.0 & Manipulação tabular do corpus, AED e construção do índice temporal \\
+		\texttt{pandas} & $\geq$ 2.0 & Manipulação tabular do corpus e apoio à Análise Exploratória de Dados (AED) \\
 		
 		\hline
 		\texttt{transformers} & $\geq$ 4.40 & Carregamento e inferência com o modelo FinBERT-PT-BR \\
@@ -116,10 +116,10 @@ A implementação foi realizada na linguagem \textbf{Python 3.11}, escolhida por
 		\texttt{emoji} & $\geq$ 2.10 & Transliteração de emojis para texto \\
 		
 		\hline
-		\texttt{plotly} & $\geq$ 5.20 & Visualizações interativas da AED e do índice de sentimento \\
+		\texttt{plotly} & $\geq$ 5.20 & Visualizações interativas da AED e dos resultados por abordagem \\
 		\hline
 	\end{tabular}
 	\legend{Fonte: Elaborado pelo autor.}
 \end{table}
 
-O código-fonte do \textit{pipeline} está organizado como um pacote Python versionado, com dependências declaradas em arquivo \texttt{requirements.txt}, de modo a facilitar a reprodução dos experimentos em ambientes distintos.
+O código-fonte do \textit{pipeline} está organizado como um pacote Python versionado, com dependências declaradas em arquivo \texttt{requirements.txt}, de modo a facilitar a reprodução dos experimentos em ambientes distintos. O repositório completo está disponível em: \url{https://github.com/toninlopes/x-sentimento-financeiro-bertimbau/tree/v1.0.0-tcc}.
